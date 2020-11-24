@@ -89,6 +89,14 @@ public class NodePrimitive : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Handles the look at detection for sphere node primitives
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="rotation"></param>
+    /// <param name="scale"></param>
+    /// <param name="cameraTransform"></param>
+    /// <returns></returns>
     private bool DetermineSphereLookAt(ref Vector3 position, ref Quaternion rotation, ref Vector3 scale, Transform cameraTransform)
     {
         Vector3 camToPrimitive = position - cameraTransform.position;
@@ -107,6 +115,14 @@ public class NodePrimitive : MonoBehaviour
         return false;
     }
 
+    /// <summary>
+    /// Handles the look at detection for cylinder node primitives
+    /// </summary>
+    /// <param name="position"></param>
+    /// <param name="rotation"></param>
+    /// <param name="scale"></param>
+    /// <param name="cameraTransform"></param>
+    /// <returns></returns>
     private bool DetermineCylinderLookat(ref Vector3 position, ref Quaternion rotation, ref Vector3 scale, Transform cameraTransform)
     {
         GameObject gameObject = new GameObject();
