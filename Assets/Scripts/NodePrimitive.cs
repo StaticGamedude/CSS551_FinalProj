@@ -115,7 +115,7 @@ public class NodePrimitive : MonoBehaviour
         gameObject.transform.rotation = rotation; //Set the rotation to an empty game object to try to determine the up vector of the cylinder
 
         Vector3 primitiveUp = gameObject.transform.up;
-        Vector3 cylinderBottomPos = position - ((scale.y /2) * primitiveUp);
+        Vector3 cylinderBottomPos = position - ((scale.y / 2) * primitiveUp);
         Vector3 cylinderTopPos = position + ((scale.y / 2) * primitiveUp);
         Vector3 cylinderLineVec = cylinderTopPos - cylinderBottomPos;
         float posProjectionOnView = Vector3.Dot(camToPrimitive, cameraTransform.forward);
@@ -131,7 +131,20 @@ public class NodePrimitive : MonoBehaviour
             PrimitiveColor = Color.white;
         }
 
-        Destroy(gameObject);
+        if (Application.isEditor)
+        {
+            /** 
+             * Since we use [ExecuteInEditMode] to be able to see all of our objects while working on the scene, it seems that Unity is unable
+             * to delete objects using the normal Destory method while in the editor mode. Rather, DestoryImmediate is needed. Not doing this, yields to
+             * empty game objects in the scene every time the application is run.
+             */
+            DestroyImmediate(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+        
         return false;
     }
 
