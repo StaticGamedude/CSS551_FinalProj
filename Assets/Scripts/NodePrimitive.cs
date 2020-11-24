@@ -8,8 +8,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Utility enum to help determine what type of look at detection we should use
+/// </summary>
+public enum PrimitiveDetectionType
+{
+    SPHERE = 0,
+    CYLINDER = 1,
+}
+
 public class NodePrimitive : MonoBehaviour
 {
+    //Amount of extra padding to help the user select the object (so they don't have to be so precise to look/select an object)
     private float SELECTION_BUFFER = 0.5f;
 
     /// <summary>
@@ -21,6 +31,11 @@ public class NodePrimitive : MonoBehaviour
     /// Color of the object
     /// </summary>
     public Color PrimitiveColor = Color.blue;
+
+    /// <summary>
+    /// Type of look at detection this object uses
+    /// </summary>
+    public PrimitiveDetectionType detectionType = PrimitiveDetectionType.SPHERE;
 
     // Start is called before the first frame update
     void Start() { }
@@ -64,6 +79,18 @@ public class NodePrimitive : MonoBehaviour
     {
         Matrix4x4 combinedTransform = ComputeTransform(ref nodeMatrix);
         BreakdownTransform(combinedTransform, out Vector3 position, out Quaternion rotation, out Vector3 scale);
+        switch (detectionType)
+        {
+            case PrimitiveDetectionType.CYLINDER:
+                return DetermineCylinderLookat(ref position, ref rotation, ref scale, cameraTransform);
+            case PrimitiveDetectionType.SPHERE:
+            default:
+                return DetermineSphereLookAt(ref position, ref rotation, ref scale, cameraTransform);
+        }
+    }
+
+    private bool DetermineSphereLookAt(ref Vector3 position, ref Quaternion rotation, ref Vector3 scale, Transform cameraTransform)
+    {
         Vector3 camToPrimitive = position - cameraTransform.position;
         float posProjectionOnView = Vector3.Dot(camToPrimitive, cameraTransform.forward);
         Vector3 linearViewPosToObject = cameraTransform.position + (posProjectionOnView * cameraTransform.forward);
@@ -72,11 +99,39 @@ public class NodePrimitive : MonoBehaviour
         if (centerToLinearPoint.magnitude < ((scale.x / 2) + SELECTION_BUFFER))
         {
             PrimitiveColor = Color.green;
-        } 
+        }
         else
         {
             PrimitiveColor = Color.white;
         }
+        return false;
+    }
+
+    private bool DetermineCylinderLookat(ref Vector3 position, ref Quaternion rotation, ref Vector3 scale, Transform cameraTransform)
+    {
+        GameObject gameObject = new GameObject();
+        Vector3 camToPrimitive = position - cameraTransform.position;
+
+        gameObject.transform.rotation = rotation; //Set the rotation to an empty game object to try to determine the up vector of the cylinder
+
+        Vector3 primitiveUp = gameObject.transform.up;
+        Vector3 cylinderBottomPos = position - ((scale.y /2) * primitiveUp);
+        Vector3 cylinderTopPos = position + ((scale.y / 2) * primitiveUp);
+        Vector3 cylinderLineVec = cylinderTopPos - cylinderBottomPos;
+        float posProjectionOnView = Vector3.Dot(camToPrimitive, cameraTransform.forward);
+        Vector3 linearViewPosToObject = cameraTransform.position + (posProjectionOnView * cameraTransform.forward);
+        Vector3 centerToLinearPoint = linearViewPosToObject - position;
+
+        if (centerToLinearPoint.magnitude < cylinderLineVec.magnitude / 2)
+        {
+            PrimitiveColor = Color.yellow;
+        }
+        else
+        {
+            PrimitiveColor = Color.white;
+        }
+
+        Destroy(gameObject);
         return false;
     }
 

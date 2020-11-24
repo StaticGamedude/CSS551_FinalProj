@@ -70,14 +70,24 @@ public class SceneNode : MonoBehaviour
     /// <param name="nodeMatrix"></param>
     /// <param name="cameraTransform"></param>
     /// <returns></returns>
-    public bool ObjectLookedAt(ref Matrix4x4 nodeMatrix, Transform cameraTransform)
+    public bool ObjectLookedAt(Transform cameraTransform)
     {
+        //For any child nodes, we need to tell them to compile their new position as well
+        foreach (Transform child in transform)
+        {
+            SceneNode childNode = child.GetComponent<SceneNode>();
+            if (childNode != null)
+            {
+                childNode.ObjectLookedAt(cameraTransform);
+            }
+        }
+
         //For any items in our primitive list, compile their new position
         if (PrimitiveList.Count > 0)
         {
             foreach (NodePrimitive primitive in PrimitiveList)
             {
-                primitive.ObjectLookedAt(ref nodeMatrix, cameraTransform);
+                primitive.ObjectLookedAt(ref combinedParentTransform, cameraTransform);
             }
         }
         return false;

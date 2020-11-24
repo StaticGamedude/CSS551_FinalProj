@@ -28,6 +28,6 @@ public class World : MonoBehaviour
 
         //TODO: we probably want to return a list from this, since we'll need to determine which object
         //is closest to the camera (in the case that there are multiple objects in front of the camera
-        BaseNode.ObjectLookedAt(ref startPos, Camera.main.transform);
+        BaseNode.ObjectLookedAt(Camera.main.transform);
     }
 }
