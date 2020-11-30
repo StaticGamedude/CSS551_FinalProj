@@ -14,6 +14,10 @@ public class World : MonoBehaviour
     //Variables to be set in the Unity Editor
     public SceneNode BaseNode;
 
+    private List<NodePrimitive> lookedAtPrimitives;
+
+    private NodePrimitive heldObject = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -28,6 +32,52 @@ public class World : MonoBehaviour
 
         //TODO: we probably want to return a list from this, since we'll need to determine which object
         //is closest to the camera (in the case that there are multiple objects in front of the camera
-        BaseNode.ObjectLookedAt(Camera.main.transform);
+        lookedAtPrimitives = BaseNode.ObjectLookedAt(Camera.main.transform);
+    }
+
+
+    public bool TryHoldObject()
+    {
+        bool objectFoundToHold = false;
+        if (lookedAtPrimitives != null && lookedAtPrimitives.Count > 0)
+        {
+            NodePrimitive closestPrimitive = lookedAtPrimitives[0];
+            foreach(NodePrimitive primitive in lookedAtPrimitives)
+            {
+                Vector3 closestPos = closestPrimitive.currentTransform.GetColumn(2);
+                Vector3 primPos = primitive.currentTransform.GetColumn(2);
+                Vector3 camToClosest = closestPos - Camera.main.transform.position;
+                Vector3 camToPrim = primPos - Camera.main.transform.position;
+
+                if (camToPrim.magnitude < camToClosest.magnitude)
+                {
+                    closestPrimitive = primitive;
+                }
+            }
+
+            if (heldObject != closestPrimitive)
+            {
+                if (heldObject != null)
+                {
+                    heldObject.parentCameraTransform = null;
+                }
+
+                heldObject = closestPrimitive;
+                heldObject.parentCameraTransform = Camera.main.transform;
+                heldObject.PerformHoldActions(Camera.main.transform);
+                objectFoundToHold = true;
+            }
+        }
+        return objectFoundToHold;
+    }
+
+    public void ReleaseObject()
+    {
+        if (heldObject != null)
+        {
+            heldObject.PerformReleaseActions();
+            heldObject.parentCameraTransform = null;
+            heldObject = null;
+        }
     }
 }

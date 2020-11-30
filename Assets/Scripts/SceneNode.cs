@@ -70,15 +70,16 @@ public class SceneNode : MonoBehaviour
     /// <param name="nodeMatrix"></param>
     /// <param name="cameraTransform"></param>
     /// <returns></returns>
-    public bool ObjectLookedAt(Transform cameraTransform)
+    public List<NodePrimitive> ObjectLookedAt(Transform cameraTransform)
     {
+        List<NodePrimitive> objectsLookedAt = new List<NodePrimitive>();
         //For any child nodes, we need to tell them to compile their new position as well
         foreach (Transform child in transform)
         {
             SceneNode childNode = child.GetComponent<SceneNode>();
             if (childNode != null)
             {
-                childNode.ObjectLookedAt(cameraTransform);
+                objectsLookedAt.AddRange(childNode.ObjectLookedAt(cameraTransform));
             }
         }
 
@@ -87,9 +88,13 @@ public class SceneNode : MonoBehaviour
         {
             foreach (NodePrimitive primitive in PrimitiveList)
             {
-                primitive.ObjectLookedAt(ref combinedParentTransform, cameraTransform);
+                bool lookedAt = primitive.ObjectLookedAt(ref combinedParentTransform, cameraTransform);
+                if (lookedAt)
+                {
+                    objectsLookedAt.Add(primitive);
+                }
             }
         }
-        return false;
+        return objectsLookedAt;
     }
 }

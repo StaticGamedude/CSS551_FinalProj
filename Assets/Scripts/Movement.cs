@@ -24,9 +24,18 @@ public class Movement : MonoBehaviour
     public Camera mainCam;
 
     /// <summary>
+    /// Reference to our world game object which tracks the world's behavior
+    /// </summary>
+    public World world;
+
+    /// <summary>
     /// Input handler which is used to detect user inputs
     /// </summary>
     private InputHandler inputHandler = null;
+
+    public GameObject camForward;
+
+    private bool objectHeld = false;
 
     
     // Start is called before the first frame update
@@ -39,6 +48,10 @@ public class Movement : MonoBehaviour
 
         Debug.Assert(inputHandler != null);
         Debug.Assert(mainCam != null);
+
+
+        camForward = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+        camForward.transform.localScale = new Vector3(0.3f, 4, 0.3f);
     }
 
     // Update is called once per frame
@@ -58,5 +71,34 @@ public class Movement : MonoBehaviour
 
             transform.Translate(newDirection);
         }
+
+        if (inputHandler.isSelectionButtonPressed())
+        {
+            if (objectHeld)
+            {
+                world.ReleaseObject();
+                objectHeld = false;
+            }
+            else
+            {
+                objectHeld = world.TryHoldObject();
+            }
+        }
+
+        //if (inputHandler.isSelectionButtonHeld())
+        //{
+        //    if (!objectHeld)
+        //    {
+        //        objectHeld = world.TryHoldObject();
+        //    }
+        //}
+        //else if (objectHeld)
+        //{
+        //    world.ReleaseObject();
+        //    objectHeld = false;
+        //}
+
+        camForward.transform.localPosition = mainCam.transform.position + (4 * mainCam.transform.forward);
+        camForward.transform.localRotation = Quaternion.FromToRotation(Vector3.up, mainCam.transform.forward);
     }
 }
