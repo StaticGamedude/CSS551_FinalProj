@@ -8,6 +8,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Handles the inputs when the user is running on Windows
+/// </summary>
 public class WindowsInputHandler : InputHandler
 {
     public int GetXInputMovement()
