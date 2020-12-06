@@ -238,6 +238,31 @@ public class NodePrimitive : MonoBehaviour
     /// <param name="cameraTransform"></param>
     public void PerformHoldActions(Transform cameraTransform)
     {
+
+        Vector3 currentPosition = currentTransform.GetColumn(3);
+        Vector3 currentCamPosition = cameraTransform.position;
+        Vector3 camToPrimitive = currentPosition - currentCamPosition;
+        float projectionOnCamForward = Vector3.Dot(cameraTransform.forward, camToPrimitive);
+        Vector3 newWorldPos = cameraTransform.position + (projectionOnCamForward * cameraTransform.forward);
+        Vector3 newLocalPos = newWorldPos - cameraTransform.position;
+        transform.localPosition = newLocalPos;
+
+
+
+
+
+
+
+
+        //Vector3 currentPosition = currentTransform.GetColumn(3);
+        //Vector3 currentCamPosition = cameraTransform.position;
+        //Vector3 camToPrimitive = currentPosition - currentCamPosition;
+        //float projectionOnCamForward = Vector3.Dot(cameraTransform.forward, camToPrimitive);
+        //Vector3 newWorldPos = cameraTransform.position + (projectionOnCamForward * cameraTransform.forward);
+        //Vector3 newLocalPos = newWorldPos - currentPosition;
+        //transform.localPosition = newLocalPos;
+
+        /*
         Vector3 currentPosition = currentTransform.GetColumn(3);
         Vector3 currentCamPosition = cameraTransform.position;
         Vector3 camToPrimitive = currentPosition - currentCamPosition;
@@ -299,6 +324,7 @@ public class NodePrimitive : MonoBehaviour
         //testObj.transform.position = newWorldPos;
         //testObj.transform.position = newLocalPos;
         //testObj.transform.position = point;
+        */
 
     }
 
