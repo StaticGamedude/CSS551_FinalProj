@@ -52,25 +52,20 @@ public class NodePrimitive : MonoBehaviour
     /// </summary>
     private bool selectable = false;
 
+    /// <summary>
+    /// Tranform of the main camera. This tranform is used to become the parent of this primitive
+    /// if the user is attempting to hold this object to move it around
+    /// </summary>
     public Transform parentCameraTransform = null;
 
-    private Matrix4x4 trueParentTransform;
-
-    private Vector3 originalLocalPosition;
-
-    private GameObject testObj;
-
-    private GameObject testLine;
-
+    /// <summary>
+    /// Parent of this node primitive. Value is stored so that it can be reassigned to when the user
+    /// releases this primitive
+    /// </summary>
     private Transform origParent;
 
-    private Matrix4x4 origOwnTransform;
-
     // Start is called before the first frame update
-    void Start() 
-    {
-        
-    }
+    void Start() { }
 
     // Update is called once per frame
     void Update() { }
@@ -95,17 +90,13 @@ public class NodePrimitive : MonoBehaviour
     /// <param name="nodeMatrix"></param>
     public void LoadShaderMatrix(ref Matrix4x4 nodeMatrix)
     {
-        Matrix4x4 parentMatrix = Matrix4x4.identity;
         if (parentCameraTransform == null)
         {
-            parentMatrix = nodeMatrix;
-            currentTransform = ComputeTransform(ref parentMatrix);
+            currentTransform = ComputeTransform(ref nodeMatrix);
             GetComponent<Renderer>().material.SetMatrix("XformMat", currentTransform);
             GetComponent<Renderer>().material.SetColor("desiredColor", PrimitiveColor);
 
             BreakdownTransform(currentTransform, out Vector3 pos, out Quaternion rot, out Vector3 scale);
-
-            int a = 4;
         }
         else
         {
@@ -113,11 +104,6 @@ public class NodePrimitive : MonoBehaviour
             GetComponent<Renderer>().material.SetMatrix("XformMat", holdingTRS);
             GetComponent<Renderer>().material.SetColor("desiredColor", PrimitiveColor);
         }
-        //if (parentCameraTransform != null)
-        //{
-        //    parentMatrix = Matrix4x4.TRS(parentCameraTransform.position, parentCameraTransform.rotation, Vector3.one);
-        //    trueParentTransform = nodeMatrix;
-        //}
     }
 
     /// <summary>
@@ -159,7 +145,6 @@ public class NodePrimitive : MonoBehaviour
         float posProjectionOnView = Vector3.Dot(camToPrimitive, cameraTransform.forward);
         Vector3 linearViewPosToObject = cameraTransform.position + (posProjectionOnView * cameraTransform.forward);
         Vector3 centerToLinearPoint = linearViewPosToObject - position;
-
 
         if (centerToLinearPoint.magnitude < ((scale.x / 2) + SELECTION_BUFFER) && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
         {
@@ -250,31 +235,17 @@ public class NodePrimitive : MonoBehaviour
     /// <param name="cameraTransform"></param>
     public void PerformHoldActions(Transform cameraTransform)
     {
-        origOwnTransform = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
         BreakdownTransform(currentTransform, out Vector3 position, out Quaternion rotation, out Vector3 scale);
         origParent = transform.parent;
         transform.parent = null;
         transform.position = position;
         transform.rotation = rotation;
         transform.localScale = scale;
-        transform.parent = Camera.main.transform;
+        transform.parent = cameraTransform;
+        parentCameraTransform = cameraTransform;
     }
 
-    /// <summary>
-    /// Perform actions necessary before attaching it back to the scene node. Need to update the local position
-    /// such that it's current position is based on the scene node's position.
-    /// </summary>
-    public void PerformReleaseActions()
-    {
-        Vector3 currentPosition = currentTransform.GetColumn(3);
-        Vector3 currentParentPosition = trueParentTransform.GetColumn(3);
-        transform.localPosition = currentPosition - currentParentPosition;
-
-        Destroy(testObj);
-        Destroy(testLine);
-    }
-
-    public bool ReleaseObject(List<Matrix4x4> parentTransforms, Matrix4x4 combined)
+    public bool ReleaseObject(Matrix4x4 nodeMatrix)
     {
         if (parentCameraTransform != null)
         {
@@ -285,16 +256,9 @@ public class NodePrimitive : MonoBehaviour
             //TODO: Add support for change in scale
 
             Matrix4x4 userDelta = Matrix4x4.TRS(changeInPosition, Quaternion.identity, Vector3.one);
-            Matrix4x4 parentInverse = Matrix4x4.identity;
             Matrix4x4 updatedPos = Matrix4x4.identity;
 
-            for (int i = 0; i < parentTransforms.Count; i++)
-            {
-                parentInverse = parentInverse * parentTransforms[i].inverse;
-            }
-
-            updatedPos = parentInverse * userDelta;
-
+            updatedPos = nodeMatrix.inverse * userDelta;
             BreakdownTransform(updatedPos, out Vector3 newPos, out Quaternion newRotation, out Vector3 newScale);
 
             transform.parent = origParent;

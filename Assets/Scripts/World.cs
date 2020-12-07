@@ -14,14 +14,23 @@ public class World : MonoBehaviour
     //Variables to be set in the Unity Editor
     public SceneNode BaseNode;
 
+    public Camera mainCam;
+
+    /// <summary>
+    /// List of node primitives that are currently in the "view range" of the main camera
+    /// </summary>
     private List<NodePrimitive> lookedAtPrimitives;
 
-    private NodePrimitive heldObject = null;
+    /// <summary>
+    /// Flag to indicate whether an object is being held in the world
+    /// </summary>
+    private bool objectHeld = false;
 
     // Start is called before the first frame update
     void Start()
     {
         Debug.Assert(BaseNode != null);
+        Debug.Assert(mainCam != null);
     }
 
     // Update is called once per frame
@@ -30,16 +39,20 @@ public class World : MonoBehaviour
         Matrix4x4 startPos = Matrix4x4.identity;
         BaseNode.CompileTransform(ref startPos);
 
-        //TODO: we probably want to return a list from this, since we'll need to determine which object
-        //is closest to the camera (in the case that there are multiple objects in front of the camera
-        lookedAtPrimitives = BaseNode.ObjectLookedAt(Camera.main.transform);
+        if (!objectHeld)
+        {
+            lookedAtPrimitives = BaseNode.ObjectLookedAt(mainCam.transform);
+        }
     }
 
-
+    /// <summary>
+    /// If no objects are currently being held and we're currently lookin at objects, attempt to grab hold
+    /// of the closet object.
+    /// </summary>
+    /// <returns></returns>
     public bool TryHoldObject()
     {
-        bool objectFoundToHold = false;
-        if (lookedAtPrimitives != null && lookedAtPrimitives.Count > 0)
+        if (!objectHeld && lookedAtPrimitives != null && lookedAtPrimitives.Count > 0)
         {
             NodePrimitive closestPrimitive = lookedAtPrimitives[0];
             foreach(NodePrimitive primitive in lookedAtPrimitives)
@@ -55,33 +68,33 @@ public class World : MonoBehaviour
                 }
             }
 
-            if (heldObject != closestPrimitive)
-            {
-                if (heldObject != null)
-                {
-                    heldObject.parentCameraTransform = null;
-                }
-
-                heldObject = closestPrimitive;
-                heldObject.parentCameraTransform = Camera.main.transform;
-                heldObject.PerformHoldActions(Camera.main.transform);
-                objectFoundToHold = true;
-            }
+            closestPrimitive.PerformHoldActions(Camera.main.transform);
+            objectHeld = true;
         }
-        return objectFoundToHold;
+        return objectHeld;
     }
 
+    /// <summary>
+    /// If an object is currently held in the world, attempt to release it.
+    /// </summary>
     public void ReleaseObject()
     {
-        if (heldObject != null)
+        if (objectHeld)
         {
-            List<Matrix4x4> parentTransforms = new List<Matrix4x4>();
-            BaseNode.ReleaseHeldObject(parentTransforms);
-            heldObject = null;
-
-            //heldObject.PerformReleaseActions();
-            //heldObject.parentCameraTransform = null;
-            //heldObject = null;
+            objectHeld = !BaseNode.ReleaseHeldObject();
+            if (objectHeld)
+            {
+                Debug.LogError("An error occurred release the currently held object in the world");
+            }
         }
+    }
+
+    /// <summary>
+    /// Determines if an object is currently being held in the world.
+    /// </summary>
+    /// <returns></returns>
+    public bool isObjectHeld()
+    {
+        return objectHeld;
     }
 }

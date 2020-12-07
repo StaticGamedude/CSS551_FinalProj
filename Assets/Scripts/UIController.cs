@@ -11,7 +11,7 @@ using UnityEngine;
 /// <summary>
 /// Handles all the movment and inputs from the user
 /// </summary>
-public class Movement : MonoBehaviour
+public class UIController : MonoBehaviour
 {
     /// <summary>
     /// Speed at which the user moves around in the world
@@ -32,11 +32,6 @@ public class Movement : MonoBehaviour
     /// Input handler which is used to detect user inputs
     /// </summary>
     private InputHandler inputHandler = null;
-
-    public GameObject camForward;
-
-    private bool objectHeld = false;
-
     
     // Start is called before the first frame update
     void Start()
@@ -48,10 +43,6 @@ public class Movement : MonoBehaviour
 
         Debug.Assert(inputHandler != null);
         Debug.Assert(mainCam != null);
-
-
-        camForward = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        camForward.transform.localScale = new Vector3(0.3f, 4, 0.3f);
     }
 
     // Update is called once per frame
@@ -74,16 +65,18 @@ public class Movement : MonoBehaviour
 
         if (inputHandler.isSelectionButtonPressed())
         {
-            if (objectHeld)
+            if (world.isObjectHeld())
             {
                 world.ReleaseObject();
-                objectHeld = false;
             }
             else
             {
-                objectHeld = world.TryHoldObject();
+                world.TryHoldObject();
             }
         }
+
+        //Leaving the code below commented for now in case we decided to switch to a "click and hold to move object"
+        //as opposed to "click to toggle holding an object"
 
         //if (inputHandler.isSelectionButtonHeld())
         //{
@@ -97,8 +90,5 @@ public class Movement : MonoBehaviour
         //    world.ReleaseObject();
         //    objectHeld = false;
         //}
-
-        camForward.transform.localPosition = mainCam.transform.position + (4 * mainCam.transform.forward);
-        camForward.transform.localRotation = Quaternion.FromToRotation(Vector3.up, mainCam.transform.forward);
     }
 }
