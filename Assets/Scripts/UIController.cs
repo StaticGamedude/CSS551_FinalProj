@@ -159,14 +159,12 @@ public class UIController : MonoBehaviour
         //}
 
 
-
-
-
-
-
         UpdateDisplays();
     }
 
+    /// <summary>
+    /// Update the lables in the world to provide information to the user as to what the current settings are
+    /// </summary>
     private void UpdateDisplays()
     {
         snowmanNodeValueText.text = world.GetCurrentSnowmanNode();
@@ -174,6 +172,11 @@ public class UIController : MonoBehaviour
         transformAxisValueText.text = GetTransformAxisName(transformAxisOptions[transformAxisIndex]);
     }
 
+    /// <summary>
+    /// Get the display name of a given axis type
+    /// </summary>
+    /// <param name="axis"></param>
+    /// <returns></returns>
     private string GetTransformAxisName(TransformAxis axis)
     {
         switch(axis)
@@ -189,6 +192,11 @@ public class UIController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Get the display name of a given transform mode
+    /// </summary>
+    /// <param name="mode"></param>
+    /// <returns></returns>
     private string GetTransformModeName(TransformMode mode)
     {
         switch (mode)
@@ -204,6 +212,9 @@ public class UIController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Change the transform mode. Cylcles through the transform mode options
+    /// </summary>
     private void ChangeTransformMode()
     {
         if (transformModeIndex == transformModeOptions.Length - 1)
@@ -216,6 +227,9 @@ public class UIController : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Change the transform axis. Cycles through the tranform axis options
+    /// </summary>
     private void ChangeTransformAxis()
     {
         if (transformAxisIndex == transformAxisOptions.Length - 1)
