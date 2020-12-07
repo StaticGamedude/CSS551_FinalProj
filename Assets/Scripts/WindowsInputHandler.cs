@@ -61,4 +61,19 @@ public class WindowsInputHandler : InputHandler
     {
         return Input.GetMouseButtonDown(0);
     }
+
+    public bool isChangeNodeButtonPressed()
+    {
+        return Input.GetKeyDown(KeyCode.N);
+    }
+
+    public bool isTransformModeButtonPressed()
+    {
+        return Input.GetKeyDown(KeyCode.T);
+    }
+
+    public bool isTransformAxisButtonPressed()
+    {
+        return Input.GetKeyDown(KeyCode.Y);
+    }
 }

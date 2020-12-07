@@ -8,6 +8,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum SnowmanNodes
+{
+    BASE = 0,
+    TORSO = 1,
+    HEAD = 2,
+}
+
 [ExecuteInEditMode]
 public class World : MonoBehaviour
 {
@@ -25,6 +32,16 @@ public class World : MonoBehaviour
     /// Flag to indicate whether an object is being held in the world
     /// </summary>
     private bool objectHeld = false;
+
+    /// <summary>
+    /// Collection of the possible snowman nodes. This array is not expected to change during runtime
+    /// </summary>
+    private SnowmanNodes[] snowmanNodes = { SnowmanNodes.BASE, SnowmanNodes.TORSO, SnowmanNodes.HEAD };
+
+    /// <summary>
+    /// Current index referencing the collection of snowman node options.
+    /// </summary>
+    private int currentNodeIndex = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -96,5 +113,38 @@ public class World : MonoBehaviour
     public bool isObjectHeld()
     {
         return objectHeld;
+    }
+
+
+    public void ChangeSnowmanNode()
+    {
+        if (currentNodeIndex == snowmanNodes.Length - 1)
+        {
+            currentNodeIndex = 0;
+        }
+        else
+        {
+            currentNodeIndex++;
+        }
+    }
+
+    public string GetCurrentSnowmanNode()
+    {
+        return GetSnowmanNodeName(snowmanNodes[currentNodeIndex]);
+    }
+
+    private string GetSnowmanNodeName(SnowmanNodes node)
+    {
+        switch(node)
+        {
+            case SnowmanNodes.BASE:
+                return "Base";
+            case SnowmanNodes.TORSO:
+                return "Torso";
+            case SnowmanNodes.HEAD:
+                return "Head";
+            default:
+                return string.Empty;
+        }
     }
 }

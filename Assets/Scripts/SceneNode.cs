@@ -12,6 +12,12 @@ public class SceneNode : MonoBehaviour
 {
 
     /// <summary>
+    /// Snowman node that this scene node represents. Expected that this value is 
+    /// set in the Unity editor
+    /// </summary>
+    public SnowmanNodes node;
+
+    /// <summary>
     /// Starting position of our scene node. This position offsets this node's position after the TRS transform
     /// </summary>
     public Vector3 nodeOrigin = Vector3.zero;

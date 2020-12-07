@@ -22,4 +22,10 @@ public interface InputHandler
     bool isSelectionButtonPressed();
 
     bool isSelectionButtonHeld();
+
+    bool isChangeNodeButtonPressed();
+
+    bool isTransformModeButtonPressed();
+
+    bool isTransformAxisButtonPressed();
 }
