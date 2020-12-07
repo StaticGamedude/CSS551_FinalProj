@@ -143,4 +143,27 @@ public class SceneNode : MonoBehaviour
 
         return objectFound;
     }
+
+    public SceneNode GetSnowmanNode(SnowmanNodes desiredNode)
+    {
+        if (node == desiredNode)
+        {
+            return this;
+        }
+
+        SceneNode nodeFound = null;
+        foreach (Transform child in transform)
+        {
+            SceneNode childNode = child.GetComponent<SceneNode>();
+            if (childNode != null)
+            {
+                nodeFound = childNode.GetSnowmanNode(desiredNode);
+                if (nodeFound != null)
+                {
+                    break;
+                }
+            }
+        }
+        return nodeFound;
+    }
 }

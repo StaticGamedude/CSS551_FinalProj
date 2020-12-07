@@ -115,7 +115,9 @@ public class World : MonoBehaviour
         return objectHeld;
     }
 
-
+    /// <summary>
+    /// Change the node selection of the snowman. Cylces through the different node options
+    /// </summary>
     public void ChangeSnowmanNode()
     {
         if (currentNodeIndex == snowmanNodes.Length - 1)
@@ -128,11 +130,20 @@ public class World : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Get the display name of the current snowman node
+    /// </summary>
+    /// <returns></returns>
     public string GetCurrentSnowmanNode()
     {
         return GetSnowmanNodeName(snowmanNodes[currentNodeIndex]);
     }
 
+    /// <summary>
+    /// Get the display name of a given snowman scene node
+    /// </summary>
+    /// <param name="node"></param>
+    /// <returns></returns>
     private string GetSnowmanNodeName(SnowmanNodes node)
     {
         switch(node)
@@ -145,6 +156,129 @@ public class World : MonoBehaviour
                 return "Head";
             default:
                 return string.Empty;
+        }
+    }
+
+    /// <summary>
+    /// Get the current snowman scene node object
+    /// </summary>
+    /// <returns></returns>
+    private SceneNode GetSnowmanSceneNode()
+    {
+        SnowmanNodes currentNodeType = snowmanNodes[currentNodeIndex];
+        SceneNode sceneNode = BaseNode.GetSnowmanNode(currentNodeType);
+
+        if (sceneNode == null)
+        {
+            Debug.LogError("Unable to current scene node: " + GetSnowmanNodeName(currentNodeType));
+        }
+        return sceneNode;
+    }
+
+    /// <summary>
+    /// Get the current snowman node local position
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 GetCurrentNodePosition()
+    {
+        Vector3 currentPosition = new Vector3();
+        SceneNode node = GetSnowmanSceneNode();
+        if (node != null)
+        {
+            currentPosition = node.transform.localPosition;
+        }
+        return currentPosition;
+    }
+
+    /// <summary>
+    /// Get the current snowman node local scale
+    /// </summary>
+    /// <returns></returns>
+    public Vector3 GetCurrentScale()
+    {
+        Vector3 currentScale = new Vector3();
+        SceneNode node = GetSnowmanSceneNode();
+        if (node != null)
+        {
+            currentScale = node.transform.localScale;
+        }
+        return currentScale;
+    }
+
+    /// <summary>
+    /// Get the current snowman local rotation
+    /// </summary>
+    /// <returns></returns>
+    public Quaternion GetCurrentRotation()
+    {
+        Quaternion currentRotation = Quaternion.identity;
+        SceneNode node = GetSnowmanSceneNode();
+        if (node != null)
+        {
+            currentRotation = node.transform.localRotation;
+        }
+        return currentRotation;
+    }
+
+    /// <summary>
+    /// Get the current snowman node axis of rotation (right, up, forward)
+    /// </summary>
+    /// <param name="axis"></param>
+    /// <returns></returns>
+    public Vector3 GetCurrentRotationAxis(TransformAxis axis)
+    {
+        SceneNode node = GetSnowmanSceneNode();
+        if (node != null)
+        {
+            switch (axis)
+            {
+                case TransformAxis.X:
+                    return node.transform.right;
+                case TransformAxis.Y:
+                    return node.transform.up;
+                case TransformAxis.Z:
+                    return node.transform.forward;
+            }
+        }
+        return Vector3.zero;
+    }
+
+    /// <summary>
+    /// Set the snowman's node position
+    /// </summary>
+    /// <param name="newPosition"></param>
+    public void SetSnowmanNodePosition(Vector3 newPosition)
+    {
+        SceneNode node = GetSnowmanSceneNode();
+        if (node != null)
+        {
+            node.transform.localPosition = newPosition;
+        }
+    }
+
+    /// <summary>
+    /// Set the snowman's node rotation
+    /// </summary>
+    /// <param name="newRotation"></param>
+    public void SetSnowmanNodeRotation(Quaternion newRotation)
+    {
+        SceneNode node = GetSnowmanSceneNode();
+        if (node != null)
+        {
+            node.transform.localRotation = newRotation;
+        }
+    }
+
+    /// <summary>
+    /// Set the snowman's node scale
+    /// </summary>
+    /// <param name="newScale"></param>
+    public void SetSnowmanNodeScale(Vector3 newScale)
+    {
+        SceneNode node = GetSnowmanSceneNode();
+        if (node != null)
+        {
+            node.transform.localScale = newScale;
         }
     }
 }

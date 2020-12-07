@@ -28,4 +28,8 @@ public interface InputHandler
     bool isTransformModeButtonPressed();
 
     bool isTransformAxisButtonPressed();
+
+    bool isIncrementButtonPressed();
+
+    bool isDecrementButtonPressed();
 }

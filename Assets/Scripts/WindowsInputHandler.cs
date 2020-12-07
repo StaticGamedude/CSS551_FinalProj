@@ -76,4 +76,14 @@ public class WindowsInputHandler : InputHandler
     {
         return Input.GetKeyDown(KeyCode.Y);
     }
+
+    public bool isIncrementButtonPressed()
+    {
+        return Input.GetKey(KeyCode.RightArrow);
+    }
+
+    public bool isDecrementButtonPressed()
+    {
+        return Input.GetKey(KeyCode.LeftArrow);
+    }
 }

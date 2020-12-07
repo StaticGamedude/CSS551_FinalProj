@@ -28,6 +28,8 @@ public enum TransformAxis
 /// </summary>
 public class UIController : MonoBehaviour
 {
+    private const int CONTROLLER_MANIP_SPEED = 5;
+
     /// <summary>
     /// Reference to the UI text for displaying the current snowman node selected in the world
     /// </summary>
@@ -101,6 +103,17 @@ public class UIController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        HandlePlayerMovementInput();
+        HandleSceneNodeManipluation();
+        HandleNodePrimitiveManipulation();
+        UpdateDisplays();
+    }
+
+    /// <summary>
+    /// Handles any inputs that are associated with the player movement
+    /// </summary>
+    private void HandlePlayerMovementInput()
+    {
         float forwardMovement = inputHandler.GetZInputMovmeent();
         float sideMovement = inputHandler.GetXInputMovement();
 
@@ -116,7 +129,28 @@ public class UIController : MonoBehaviour
 
             transform.Translate(newDirection);
         }
+    }
+    
+    /// <summary>
+    /// Handle any inputs that are associated with independent scene node manipulation
+    /// </summary>
+    private void HandleSceneNodeManipluation()
+    {
+        if (inputHandler.isIncrementButtonPressed())
+        {
+            UpdateNodeTransform(CONTROLLER_MANIP_SPEED);
+        }
+        else if (inputHandler.isDecrementButtonPressed())
+        {
+            UpdateNodeTransform(-1 * CONTROLLER_MANIP_SPEED);
+        }
+    }
 
+    /// <summary>
+    /// Handle any inputs that are associated with manipulating any node primitives
+    /// </summary>
+    private void HandleNodePrimitiveManipulation()
+    {
         //Handle object manipulation inputs
         if (!world.isObjectHeld())
         {
@@ -136,7 +170,7 @@ public class UIController : MonoBehaviour
             {
                 world.TryHoldObject();
             }
-        } 
+        }
         else if (inputHandler.isSelectionButtonPressed())
         {
             world.ReleaseObject();
@@ -157,9 +191,6 @@ public class UIController : MonoBehaviour
         //    world.ReleaseObject();
         //    objectHeld = false;
         //}
-
-
-        UpdateDisplays();
     }
 
     /// <summary>
@@ -240,5 +271,88 @@ public class UIController : MonoBehaviour
         {
             transformAxisIndex++;
         }
+    }
+
+    /// <summary>
+    /// Update the transform of the currently selected snowman scene node
+    /// </summary>
+    /// <param name="speed"></param>
+    private void UpdateNodeTransform(int speed)
+    {
+        TransformMode currentTransformMode = transformModeOptions[transformModeIndex];
+        TransformAxis currentTransformAxis = transformAxisOptions[transformAxisIndex];
+
+        switch(currentTransformMode)
+        {
+            case TransformMode.TRANSLATE:
+                TranslateNode(currentTransformAxis, speed);
+                break;
+            case TransformMode.SCALE:
+                ScaleNode(currentTransformAxis, speed);
+                break;
+            case TransformMode.ROTATE:
+                RotateNode(currentTransformAxis, speed);
+                break;
+        }
+    }
+
+    /// <summary>
+    /// Translate the currently selected snowman scene node
+    /// </summary>
+    /// <param name="axis"></param>
+    /// <param name="speed"></param>
+    private void TranslateNode(TransformAxis axis, int speed)
+    {
+        Vector3 currentNodePosition = world.GetCurrentNodePosition();
+        switch(axis)
+        {
+            case TransformAxis.X:
+                currentNodePosition.x += speed * Time.smoothDeltaTime;
+                break;
+            case TransformAxis.Y:
+                currentNodePosition.y += speed * Time.smoothDeltaTime;
+                break;
+            case TransformAxis.Z:
+                currentNodePosition.z += speed * Time.smoothDeltaTime;
+                break;
+        }
+        world.SetSnowmanNodePosition(currentNodePosition);
+    }
+
+    /// <summary>
+    /// Rotate the currently selected snowman scene node
+    /// </summary>
+    /// <param name="axis"></param>
+    /// <param name="speed"></param>
+    private void RotateNode(TransformAxis axis, int speed)
+    {
+        Vector3 rotationAxis = world.GetCurrentRotationAxis(axis);
+        Quaternion currentRotation = world.GetCurrentRotation();
+        Quaternion appliedRotation = Quaternion.AngleAxis(speed, rotationAxis);
+        currentRotation = appliedRotation * currentRotation;
+        world.SetSnowmanNodeRotation(currentRotation);
+    }
+
+    /// <summary>
+    /// Scale the currently selected snowman scene node
+    /// </summary>
+    /// <param name="axis"></param>
+    /// <param name="speed"></param>
+    private void ScaleNode(TransformAxis axis, int speed)
+    {
+        Vector3 currentNodeScale = world.GetCurrentScale();
+        switch (axis)
+        {
+            case TransformAxis.X:
+                currentNodeScale.x += speed * Time.smoothDeltaTime;
+                break;
+            case TransformAxis.Y:
+                currentNodeScale.y += speed * Time.smoothDeltaTime;
+                break;
+            case TransformAxis.Z:
+                currentNodeScale.z += speed * Time.smoothDeltaTime;
+                break;
+        }
+        world.SetSnowmanNodeScale(currentNodeScale);
     }
 }
