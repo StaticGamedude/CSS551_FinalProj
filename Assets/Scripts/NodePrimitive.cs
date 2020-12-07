@@ -62,6 +62,10 @@ public class NodePrimitive : MonoBehaviour
 
     private GameObject testLine;
 
+    private Transform origParent;
+
+    private Matrix4x4 origOwnTransform;
+
     // Start is called before the first frame update
     void Start() 
     {
@@ -92,20 +96,28 @@ public class NodePrimitive : MonoBehaviour
     public void LoadShaderMatrix(ref Matrix4x4 nodeMatrix)
     {
         Matrix4x4 parentMatrix = Matrix4x4.identity;
-
-        if (parentCameraTransform != null)
-        {
-            parentMatrix = Matrix4x4.TRS(parentCameraTransform.position, parentCameraTransform.rotation, Vector3.one);
-            trueParentTransform = nodeMatrix;
-        } 
-        else
+        if (parentCameraTransform == null)
         {
             parentMatrix = nodeMatrix;
-        }
+            currentTransform = ComputeTransform(ref parentMatrix);
+            GetComponent<Renderer>().material.SetMatrix("XformMat", currentTransform);
+            GetComponent<Renderer>().material.SetColor("desiredColor", PrimitiveColor);
 
-        currentTransform = ComputeTransform(ref parentMatrix);
-        GetComponent<Renderer>().material.SetMatrix("XformMat", currentTransform);
-        GetComponent<Renderer>().material.SetColor("desiredColor", PrimitiveColor);
+            BreakdownTransform(currentTransform, out Vector3 pos, out Quaternion rot, out Vector3 scale);
+
+            int a = 4;
+        }
+        else
+        {
+            Matrix4x4 holdingTRS = Matrix4x4.TRS(transform.position, transform.rotation, transform.localScale);
+            GetComponent<Renderer>().material.SetMatrix("XformMat", holdingTRS);
+            GetComponent<Renderer>().material.SetColor("desiredColor", PrimitiveColor);
+        }
+        //if (parentCameraTransform != null)
+        //{
+        //    parentMatrix = Matrix4x4.TRS(parentCameraTransform.position, parentCameraTransform.rotation, Vector3.one);
+        //    trueParentTransform = nodeMatrix;
+        //}
     }
 
     /// <summary>
@@ -238,94 +250,14 @@ public class NodePrimitive : MonoBehaviour
     /// <param name="cameraTransform"></param>
     public void PerformHoldActions(Transform cameraTransform)
     {
-
-        Vector3 currentPosition = currentTransform.GetColumn(3);
-        Vector3 currentCamPosition = cameraTransform.position;
-        Vector3 camToPrimitive = currentPosition - currentCamPosition;
-        float projectionOnCamForward = Vector3.Dot(cameraTransform.forward, camToPrimitive);
-        Vector3 newWorldPos = cameraTransform.position + (projectionOnCamForward * cameraTransform.forward);
-        Vector3 newLocalPos = newWorldPos - cameraTransform.position;
-        transform.localPosition = newLocalPos;
-
-
-
-
-
-
-
-
-        //Vector3 currentPosition = currentTransform.GetColumn(3);
-        //Vector3 currentCamPosition = cameraTransform.position;
-        //Vector3 camToPrimitive = currentPosition - currentCamPosition;
-        //float projectionOnCamForward = Vector3.Dot(cameraTransform.forward, camToPrimitive);
-        //Vector3 newWorldPos = cameraTransform.position + (projectionOnCamForward * cameraTransform.forward);
-        //Vector3 newLocalPos = newWorldPos - currentPosition;
-        //transform.localPosition = newLocalPos;
-
-        /*
-        Vector3 currentPosition = currentTransform.GetColumn(3);
-        Vector3 currentCamPosition = cameraTransform.position;
-        Vector3 camToPrimitive = currentPosition - currentCamPosition;
-        float projectionOnCamForward = Vector3.Dot(cameraTransform.forward, camToPrimitive);
-        Vector3 newWorldPos = cameraTransform.position + (projectionOnCamForward * cameraTransform.forward);
-        Vector3 newLocalPos = newWorldPos - cameraTransform.position;
-
-
-        //transform.parent = cameraTransform;
-        //Vector3 tempPosition = transform.localPosition;
-        //Quaternion tempRotation = transform.localRotation;
-        //Vector3 tempScale = transform.localScale;
-
-        transform.localPosition = newLocalPos;
-
-
-        //testLine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-        //testLine.GetComponent<Renderer>().material.SetColor("_Color", Color.cyan);
-        //testLine.transform.localScale = new Vector3(0.5f, newLocalPos.magnitude / 2, 0.5f);
-        //testLine.transform.position = currentCamPosition + ((newLocalPos.magnitude / 2) * newLocalPos.normalized);
-        //testLine.transform.localRotation = Quaternion.FromToRotation(Vector3.up, newLocalPos);
-        //testLine.name = "test line";
-
-        //testObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        //testObj.GetComponent<Renderer>().material.SetColor("_Color", Color.cyan);
-        //testObj.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-        //testObj.transform.position = currentCamPosition + newLocalPos;
-        //testObj.name = "test point";
-
-
-
-
-
-
-
-        //Vector3 placedWorldPos = transform.position;
-        //Vector3 camToPlacedPos = placedWorldPos - currentCamPosition;
-
-        //float angleToForward = Mathf.Acos(Vector3.Dot(camToPlacedPos.normalized, cameraTransform.forward)) * Mathf.Rad2Deg;
-        //Debug.Log("Angle: " + angleToForward);
-        //Vector3 rotationAxis = Vector3.Cross(camToPlacedPos.normalized, cameraTransform.forward); 
-
-        //Matrix4x4 positionMat = Matrix4x4.TRS(newLocalPos, Quaternion.identity, Vector3.one);
-        //Matrix4x4 rotationMat = Matrix4x4.Rotate(Quaternion.AngleAxis(angleToForward, rotationAxis));
-        //Matrix4x4 combinedPosition = rotationMat * positionMat;
-
-
-
-        //transform.localPosition = combinedPosition.GetColumn(3);
-
-
-
-
-
-        //Matrix4x4 tempCam = Matrix4x4.TRS(currentCamPosition, cameraTransform.rotation, Vector3.one);
-        //Matrix4x4 tempPrim = Matrix4x4.TRS(newLocalPos, transform.localRotation, transform.localScale);
-        //Matrix4x4 result = tempCam * tempPrim;
-        //Vector3 point = result.GetColumn(3);
-        //testObj.transform.position = newWorldPos;
-        //testObj.transform.position = newLocalPos;
-        //testObj.transform.position = point;
-        */
-
+        origOwnTransform = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
+        BreakdownTransform(currentTransform, out Vector3 position, out Quaternion rotation, out Vector3 scale);
+        origParent = transform.parent;
+        transform.parent = null;
+        transform.position = position;
+        transform.rotation = rotation;
+        transform.localScale = scale;
+        transform.parent = Camera.main.transform;
     }
 
     /// <summary>
@@ -340,5 +272,38 @@ public class NodePrimitive : MonoBehaviour
 
         Destroy(testObj);
         Destroy(testLine);
+    }
+
+    public bool ReleaseObject(List<Matrix4x4> parentTransforms, Matrix4x4 combined)
+    {
+        if (parentCameraTransform != null)
+        {
+            BreakdownTransform(currentTransform, out Vector3 originalPosition, out Quaternion originalRotation, out Vector3 originalScale);
+
+            Vector3 changeInPosition = transform.position - originalPosition;
+            //TOOD: Add support for change in rotation
+            //TODO: Add support for change in scale
+
+            Matrix4x4 userDelta = Matrix4x4.TRS(changeInPosition, Quaternion.identity, Vector3.one);
+            Matrix4x4 parentInverse = Matrix4x4.identity;
+            Matrix4x4 updatedPos = Matrix4x4.identity;
+
+            for (int i = 0; i < parentTransforms.Count; i++)
+            {
+                parentInverse = parentInverse * parentTransforms[i].inverse;
+            }
+
+            updatedPos = parentInverse * userDelta;
+
+            BreakdownTransform(updatedPos, out Vector3 newPos, out Quaternion newRotation, out Vector3 newScale);
+
+            transform.parent = origParent;
+            transform.localPosition = originalPosition + newPos;
+            
+            parentCameraTransform = null;
+            return true;
+        }
+        return false;
+        
     }
 }

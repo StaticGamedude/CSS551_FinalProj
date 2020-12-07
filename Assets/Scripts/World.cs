@@ -75,9 +75,13 @@ public class World : MonoBehaviour
     {
         if (heldObject != null)
         {
-            heldObject.PerformReleaseActions();
-            heldObject.parentCameraTransform = null;
+            List<Matrix4x4> parentTransforms = new List<Matrix4x4>();
+            BaseNode.ReleaseHeldObject(parentTransforms);
             heldObject = null;
+
+            //heldObject.PerformReleaseActions();
+            //heldObject.parentCameraTransform = null;
+            //heldObject = null;
         }
     }
 }

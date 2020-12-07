@@ -97,4 +97,43 @@ public class SceneNode : MonoBehaviour
         }
         return objectsLookedAt;
     }
+
+    public bool ReleaseHeldObject(List<Matrix4x4> parentTransforms)
+    {
+        Matrix4x4 originatingPostion = Matrix4x4.Translate(nodeOrigin);
+        Matrix4x4 trs = Matrix4x4.TRS(transform.localPosition, transform.localRotation, transform.localScale);
+        Matrix4x4 nodeTransform = originatingPostion * trs;
+        bool objectFound = false;
+        parentTransforms.Add(nodeTransform);
+
+        if (PrimitiveList.Count > 0)
+        {
+            foreach(NodePrimitive primitive in PrimitiveList)
+            {
+                if (primitive.ReleaseObject(parentTransforms, combinedParentTransform))
+                {
+                    objectFound = true;
+                    break;
+                }
+            }
+        }
+
+        if (!objectFound)
+        {
+            foreach (Transform child in transform)
+            {
+                SceneNode childNode = child.GetComponent<SceneNode>();
+                if (childNode != null)
+                {
+                    objectFound = childNode.ReleaseHeldObject(parentTransforms);
+                    if (objectFound)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return objectFound;
+    }
 }
