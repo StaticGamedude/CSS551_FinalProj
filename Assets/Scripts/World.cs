@@ -19,14 +19,16 @@ public enum SnowmanNodes
 public class World : MonoBehaviour
 {
     //Variables to be set in the Unity Editor
-    public SceneNode BaseNode;
+    public SceneNode BaseNode; //Reference to the base scene node in the world
 
-    public Camera mainCam;
+    public Camera mainCam; //Reference to the main camera
+
+    public Material stardardObjectMat; //Reference to our custom shader
 
     /// <summary>
     /// List of node primitives that are currently in the "view range" of the main camera
     /// </summary>
-    private List<NodePrimitive> lookedAtPrimitives;
+    private List<NodePrimitive> lookedAtPrimitives = new List<NodePrimitive>();
 
     /// <summary>
     /// Flag to indicate whether an object is being held in the world
@@ -43,6 +45,11 @@ public class World : MonoBehaviour
     /// </summary>
     private int currentNodeIndex = 0;
 
+    /// <summary>
+    /// Flag to inciate whether or not we should skip over the logic for determining if we're looking at primitives.
+    /// </summary>
+    private bool skipLookatBehavior = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -56,7 +63,7 @@ public class World : MonoBehaviour
         Matrix4x4 startPos = Matrix4x4.identity;
         BaseNode.CompileTransform(ref startPos);
 
-        if (!objectHeld)
+        if (!objectHeld && !skipLookatBehavior)
         {
             lookedAtPrimitives = BaseNode.ObjectLookedAt(mainCam.transform);
         }
@@ -280,5 +287,43 @@ public class World : MonoBehaviour
         {
             node.transform.localScale = newScale;
         }
+    }
+
+    /// <summary>
+    /// Determines if an object is currently being looked at in the world
+    /// </summary>
+    /// <returns></returns>
+    public bool lookingAtNodePrimitive()
+    {
+        return lookedAtPrimitives.Count > 0;
+    }
+
+    /// <summary>
+    /// Adds a game object as a node primitive to the world
+    /// </summary>
+    /// <param name="snowmanObject"></param>
+    public void AddPrimitiveToCurrentNode(GameObject snowmanObject)
+    {
+        if (snowmanObject != null)
+        {
+            NodePrimitive primitive = snowmanObject.AddComponent<NodePrimitive>();
+            primitive.PrimitiveColor = snowmanObject.GetComponent<Renderer>().material.GetColor("_Color");
+            primitive.detectionType = PrimitiveDetectionType.CYLINDER;
+            snowmanObject.GetComponent<Renderer>().material = stardardObjectMat;
+            SceneNode node = GetSnowmanSceneNode();
+            node.AddPrimitive(primitive);
+        }
+    }
+
+    /// <summary>
+    /// Set the skip look behavior flag. Used primarily when the user is interacting with a new game object
+    /// 
+    /// TODO: This is sort of hacky and doesn't fit in the MVC model all that well. If time permitted, should 
+    /// see if we can find away to maybe track new potential game objects in the world?
+    /// </summary>
+    /// <param name="skip"></param>
+    public void SetSkipLookBehavior(bool skip)
+    {
+        skipLookatBehavior = skip;
     }
 }

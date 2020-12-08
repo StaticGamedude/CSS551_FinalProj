@@ -144,6 +144,11 @@ public class SceneNode : MonoBehaviour
         return objectFound;
     }
 
+    /// <summary>
+    /// Get the appropriate snowman scene node based on the provided scene node level provided
+    /// </summary>
+    /// <param name="desiredNode"></param>
+    /// <returns></returns>
     public SceneNode GetSnowmanNode(SnowmanNodes desiredNode)
     {
         if (node == desiredNode)
@@ -165,5 +170,20 @@ public class SceneNode : MonoBehaviour
             }
         }
         return nodeFound;
+    }
+
+    /// <summary>
+    /// Add a new node primitive to the current snowman scene node
+    /// </summary>
+    /// <param name="newPrimitive"></param>
+    public void AddPrimitive(NodePrimitive newPrimitive)
+    {
+        if (newPrimitive != null)
+        {
+            Vector3 currentSceneNodePosition = combinedParentTransform.GetColumn(3);
+            Vector3 updatedLocalPosition = newPrimitive.transform.position - currentSceneNodePosition;
+            newPrimitive.transform.localPosition = updatedLocalPosition;
+            PrimitiveList.Add(newPrimitive);
+        }
     }
 }

@@ -28,7 +28,15 @@ public enum TransformAxis
 /// </summary>
 public class UIController : MonoBehaviour
 {
+    /// <summary>
+    /// Speed at which objects are manipulated in the world using a controller
+    /// </summary>
     private const int CONTROLLER_MANIP_SPEED = 5;
+
+    /// <summary>
+    /// The object layer referring to game objects that can be added to scene nodes in the world
+    /// </summary>
+    private const int SNOWMAN_OBJECT_LAYER = 8;
 
     /// <summary>
     /// Reference to the UI text for displaying the current snowman node selected in the world
@@ -85,6 +93,11 @@ public class UIController : MonoBehaviour
     /// </summary>
     private int transformAxisIndex = 0;
 
+    /// <summary>
+    /// Reference to the game object being held as the user is position it to be placed on the snowman scene node
+    /// </summary>
+    private GameObject heldSnowmanObject = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -111,6 +124,7 @@ public class UIController : MonoBehaviour
         HandlePlayerMovementInput();
         HandleSceneNodeManipluation();
         HandleNodePrimitiveManipulation();
+        HandleNewObjectManipulation();
         UpdateDisplays();
     }
 
@@ -196,6 +210,42 @@ public class UIController : MonoBehaviour
         //    world.ReleaseObject();
         //    objectHeld = false;
         //}
+    }
+
+    /// <summary>
+    /// Handles the inputs for interacting with game objects that can become node primitives in our world
+    /// </summary>
+    private void HandleNewObjectManipulation()
+    {
+        if (!world.lookingAtNodePrimitive())
+        {
+            if (inputHandler.isSelectionButtonPressed())
+            {
+                if (heldSnowmanObject == null)
+                {
+                    /**
+                     * TODO: Since this behavior is not directly associated with our SceneNode structure to start,
+                     * we should check with Professor Sung to make sure we can perform a Raycast here
+                     */
+                    RaycastHit hit;
+                    int snowmanObjectLayer = 1 << SNOWMAN_OBJECT_LAYER;
+                    if (Physics.Raycast(mainCam.transform.position, mainCam.transform.forward, out hit, Mathf.Infinity, snowmanObjectLayer))
+                    {
+                        heldSnowmanObject = hit.collider.gameObject;
+                        Instantiate(heldSnowmanObject); //Duplicate the game object so that users can add a new of of this object later
+                        heldSnowmanObject.transform.parent = mainCam.transform;
+                        world.SetSkipLookBehavior(true);
+                    }
+                }
+                else
+                {
+                    heldSnowmanObject.transform.parent = null;
+                    world.AddPrimitiveToCurrentNode(heldSnowmanObject);
+                    heldSnowmanObject = null;
+                    world.SetSkipLookBehavior(false);
+                }
+            }
+        }
     }
 
     /// <summary>

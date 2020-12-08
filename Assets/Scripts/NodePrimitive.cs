@@ -33,7 +33,7 @@ public class NodePrimitive : MonoBehaviour
     public Vector3 PivotPosition;
 
     /// <summary>
-    /// Color of the object
+    /// Desired color of the object
     /// </summary>
     public Color PrimitiveColor = Color.blue;
 
@@ -64,8 +64,16 @@ public class NodePrimitive : MonoBehaviour
     /// </summary>
     private Transform origParent;
 
+    /// <summary>
+    /// Current color of the primitive. Changes if the object is being looked at or interacted with
+    /// </summary>
+    private Color currentDisplayColor;
+
     // Start is called before the first frame update
-    void Start() { }
+    void Start() 
+    {
+        currentDisplayColor = PrimitiveColor;
+    }
 
     // Update is called once per frame
     void Update() { }
@@ -94,7 +102,7 @@ public class NodePrimitive : MonoBehaviour
         {
             currentTransform = ComputeTransform(ref nodeMatrix);
             GetComponent<Renderer>().material.SetMatrix("XformMat", currentTransform);
-            GetComponent<Renderer>().material.SetColor("desiredColor", PrimitiveColor);
+            GetComponent<Renderer>().material.SetColor("desiredColor", currentDisplayColor);
 
             BreakdownTransform(currentTransform, out Vector3 pos, out Quaternion rot, out Vector3 scale);
         }
@@ -102,7 +110,7 @@ public class NodePrimitive : MonoBehaviour
         {
             Matrix4x4 holdingTRS = Matrix4x4.TRS(transform.position, transform.rotation, transform.localScale);
             GetComponent<Renderer>().material.SetMatrix("XformMat", holdingTRS);
-            GetComponent<Renderer>().material.SetColor("desiredColor", PrimitiveColor);
+            GetComponent<Renderer>().material.SetColor("desiredColor", currentDisplayColor);
         }
     }
 
@@ -162,12 +170,12 @@ public class NodePrimitive : MonoBehaviour
         if (centerToLinearPoint.magnitude < (comparableScaleSize / 2) && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
         {
             selectable = true;
-            PrimitiveColor = Color.green;
+            currentDisplayColor = Color.green;
         }
         else
         {
             selectable = false;
-            PrimitiveColor = Color.white;
+            currentDisplayColor = PrimitiveColor;
         }
         return selectable;
     }
@@ -198,12 +206,12 @@ public class NodePrimitive : MonoBehaviour
         if (centerToLinearPoint.magnitude < cylinderLineVec.magnitude / 2 && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
         {
             selectable = true;
-            PrimitiveColor = Color.green;
+            currentDisplayColor = Color.green;
         }
         else
         {
             selectable = false;
-            PrimitiveColor = Color.white;
+            currentDisplayColor = PrimitiveColor;
         }
 
         if (Application.isEditor)
