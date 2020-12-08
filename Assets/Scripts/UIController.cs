@@ -92,6 +92,11 @@ public class UIController : MonoBehaviour
         {
             inputHandler = new WindowsInputHandler();
         }
+        else if (Application.platform == RuntimePlatform.Android)
+        {
+            inputHandler = new MYGTInputHandler();
+            //TODO: Guessing we'll need a flag here to determine if we should be referencing an occulus controller instead
+        }
 
         Debug.Assert(inputHandler != null);
         Debug.Assert(mainCam != null);

@@ -13,11 +13,11 @@ using UnityEngine;
 /// </summary>
 public interface InputHandler
 {
-    int GetZInputMovmeent();
+    float GetZInputMovmeent();
 
-    int GetXInputMovement();
+    float GetXInputMovement();
 
-    int GetYInputMovement();
+    float GetYInputMovement();
 
     bool isSelectionButtonPressed();
 

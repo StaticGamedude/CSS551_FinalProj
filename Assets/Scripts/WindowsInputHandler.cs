@@ -13,41 +13,41 @@ using UnityEngine;
 /// </summary>
 public class WindowsInputHandler : InputHandler
 {
-    public int GetXInputMovement()
+    public float GetXInputMovement()
     {
         if (Input.GetKey(KeyCode.D))
         {
-            return 1;
+            return 1f;
         }
         else if (Input.GetKey(KeyCode.A))
         {
-            return -1;
+            return -1f;
         }
         return 0;
     }
 
-    public int GetYInputMovement()
+    public float GetYInputMovement()
     {
-        if (Input.GetKey(KeyCode.Space))
+        if (Input.GetKey(KeyCode.UpArrow))
         {
-            return 1;
+            return 1f;
         }
-        else if (Input.GetKey(KeyCode.LeftControl))
+        else if (Input.GetKey(KeyCode.DownArrow))
         {
-            return -1;
+            return -1f;
         }
         return 0;
     }
 
-    public int GetZInputMovmeent()
+    public float GetZInputMovmeent()
     {
         if (Input.GetKey(KeyCode.W))
         {
-            return 1;
+            return 1f;
         }
         else if (Input.GetKey(KeyCode.S))
         {
-            return -1;
+            return -1f;
         }
         return 0;
     }
