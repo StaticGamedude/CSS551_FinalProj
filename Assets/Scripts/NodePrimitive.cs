@@ -146,7 +146,20 @@ public class NodePrimitive : MonoBehaviour
         Vector3 linearViewPosToObject = cameraTransform.position + (posProjectionOnView * cameraTransform.forward);
         Vector3 centerToLinearPoint = linearViewPosToObject - position;
 
-        if (centerToLinearPoint.magnitude < ((scale.x / 2) + SELECTION_BUFFER) && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
+        //TODO: If time allows, we shold probably revisit this. The detection here is pretty forgiving since we're checking against the largest scale value
+        float comparableScaleSize = scale.x;
+
+        if (scale.y > comparableScaleSize)
+        {
+            comparableScaleSize = scale.y;
+        }
+
+        if (scale.z > comparableScaleSize)
+        {
+            comparableScaleSize = scale.x;
+        }
+
+        if (centerToLinearPoint.magnitude < (comparableScaleSize / 2) && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
         {
             selectable = true;
             PrimitiveColor = Color.green;
