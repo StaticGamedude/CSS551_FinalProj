@@ -236,6 +236,7 @@ public class UIController : MonoBehaviour
                         heldSnowmanObject = hit.collider.gameObject;
                         GameObject clonedObject = Instantiate(heldSnowmanObject); //Duplicate the game object so that users can add a new of of this object later
                         clonedObject.transform.position = heldSnowmanObject.transform.position;
+                        clonedObject.transform.parent = heldSnowmanObject.transform.parent;
                         heldSnowmanObject.transform.parent = mainCam.transform;
                         world.SetSkipLookBehavior(true);
                     }

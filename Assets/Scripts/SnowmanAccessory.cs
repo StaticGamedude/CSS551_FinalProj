@@ -18,17 +18,6 @@ public class SnowmanAccessory : MonoBehaviour
 
     public void SetColor(Color color)
     {
-        //Renderer renderer = GetComponent<Renderer>();
-        //if (ContainerObj != null&& renderer != null && renderer.material != null)
-        //{
-        //    renderer.material.SetColor("_Color", color);
-        //}
-
-        //foreach (Transform child in transform)
-        //{
-        //    SetColorToWholeObject(child.gameObject, color, true);
-        //}
-
         SetColorToWholeObject(gameObject, color, !ContainerObj);
     }
 

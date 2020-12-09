@@ -20,11 +20,13 @@ public class World : MonoBehaviour
 {
     //Variables to be set in the Unity Editor
     public SceneNode BaseNode; //Reference to the base scene node in the world
-
     public Camera mainCam; //Reference to the main camera
-
     public Material stardardObjectMat; //Reference to our custom shader
 
+    public GameObject BaseAccessories; //References the game object which contains game objects that can be added to the base of the snowman
+    public GameObject TorsoAccessories; //References the game object which contains game objects that can be added to the torso of the snowman
+    public GameObject HeadAccessories; //References the game object which contains game objects that can be added to the head of the snowman
+    
     /// <summary>
     /// List of node primitives that are currently in the "view range" of the main camera
     /// </summary>
@@ -55,6 +57,12 @@ public class World : MonoBehaviour
     {
         Debug.Assert(BaseNode != null);
         Debug.Assert(mainCam != null);
+        Debug.Assert(stardardObjectMat != null);
+        Debug.Assert(BaseAccessories != null);
+        Debug.Assert(TorsoAccessories != null);
+        Debug.Assert(HeadAccessories != null);
+
+        ShowAppropriateSnowmanObjects();
     }
 
     // Update is called once per frame
@@ -135,6 +143,7 @@ public class World : MonoBehaviour
         {
             currentNodeIndex++;
         }
+        ShowAppropriateSnowmanObjects();
     }
 
     /// <summary>
@@ -334,5 +343,29 @@ public class World : MonoBehaviour
     public void SetSkipLookBehavior(bool skip)
     {
         skipLookatBehavior = skip;
+    }
+
+    /// <summary>
+    /// Determines which set of snowman accessories to set active in the world base on the current snowman node
+    /// </summary>
+    private void ShowAppropriateSnowmanObjects()
+    {
+        SnowmanNodes currentNode = snowmanNodes[currentNodeIndex];
+        BaseAccessories.SetActive(false);
+        TorsoAccessories.SetActive(false);
+        HeadAccessories.SetActive(false);
+        
+        switch(currentNode)
+        {
+            case SnowmanNodes.BASE:
+                BaseAccessories.SetActive(true);
+                break;
+            case SnowmanNodes.TORSO:
+                TorsoAccessories.SetActive(true);
+                break;
+            case SnowmanNodes.HEAD:
+                HeadAccessories.SetActive(true);
+                break;
+        }
     }
 }
