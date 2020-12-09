@@ -135,16 +135,18 @@ public class UIController : MonoBehaviour
     {
         float forwardMovement = inputHandler.GetZInputMovmeent();
         float sideMovement = inputHandler.GetXInputMovement();
+        float upMovement = inputHandler.GetYInputMovement();
 
         //Handle Player walking movments
-        if (forwardMovement != 0 || sideMovement != 0)
+        if (forwardMovement != 0 || sideMovement != 0 || upMovement != 0)
         {
             Vector3 camForward = mainCam.transform.forward;
             camForward.y = 0;
 
             Vector3 verticalDirection = camForward * PLAYER_MOVEMENT_SPEED * forwardMovement * Time.smoothDeltaTime;
             Vector3 horizontalDirection = mainCam.transform.right * PLAYER_MOVEMENT_SPEED * sideMovement * Time.smoothDeltaTime;
-            Vector3 newDirection = verticalDirection + horizontalDirection;
+            Vector3 upwardDireciton = new Vector3(0, PLAYER_MOVEMENT_SPEED * upMovement * Time.smoothDeltaTime, 0);
+            Vector3 newDirection = verticalDirection + horizontalDirection + upwardDireciton;
 
             transform.Translate(newDirection);
         }
