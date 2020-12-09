@@ -234,7 +234,8 @@ public class UIController : MonoBehaviour
                     if (Physics.Raycast(mainCam.transform.position, mainCam.transform.forward, out hit, Mathf.Infinity, snowmanObjectLayer))
                     {
                         heldSnowmanObject = hit.collider.gameObject;
-                        Instantiate(heldSnowmanObject); //Duplicate the game object so that users can add a new of of this object later
+                        GameObject clonedObject = Instantiate(heldSnowmanObject); //Duplicate the game object so that users can add a new of of this object later
+                        clonedObject.transform.position = heldSnowmanObject.transform.position;
                         heldSnowmanObject.transform.parent = mainCam.transform;
                         world.SetSkipLookBehavior(true);
                     }

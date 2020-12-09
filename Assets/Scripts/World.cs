@@ -306,12 +306,21 @@ public class World : MonoBehaviour
     {
         if (snowmanObject != null)
         {
-            NodePrimitive primitive = snowmanObject.AddComponent<NodePrimitive>();
-            primitive.PrimitiveColor = snowmanObject.GetComponent<Renderer>().material.GetColor("_Color");
-            primitive.detectionType = PrimitiveDetectionType.CYLINDER;
-            snowmanObject.GetComponent<Renderer>().material = stardardObjectMat;
-            SceneNode node = GetSnowmanSceneNode();
-            node.AddPrimitive(primitive);
+            SnowmanAccessory accessory = snowmanObject.GetComponent<SnowmanAccessory>();
+            if (accessory != null)
+            {
+                snowmanObject.layer = 0; //Change the layer since we no longer want to treat this object as an free object
+                snowmanObject.GetComponent<Renderer>().material = stardardObjectMat;
+                NodePrimitive primitive = snowmanObject.AddComponent<NodePrimitive>();
+                primitive.PrimitiveColor = accessory.PrimaryColor;
+                primitive.detectionType = accessory.DetectionType;
+                SceneNode node = GetSnowmanSceneNode();
+                node.AddPrimitive(primitive);
+            }
+            else
+            {
+                Debug.LogError("The object grab is not a valid snowman accessory object");
+            }
         }
     }
 

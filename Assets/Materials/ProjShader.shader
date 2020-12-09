@@ -26,6 +26,7 @@
 
             float4x4 XformMat;
             fixed4 desiredColor;
+            float transparentObj;
 
             v2f vert(appdata v)
             {
@@ -37,6 +38,9 @@
 
             fixed4 frag(v2f i) : SV_Target
             {
+                if (transparentObj == 0) {
+                    discard;
+                }
                 return desiredColor;
             }
             ENDCG

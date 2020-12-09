@@ -69,10 +69,17 @@ public class NodePrimitive : MonoBehaviour
     /// </summary>
     private Color currentDisplayColor;
 
+    /// <summary>
+    /// Reference to the accessory component of the node primitives.
+    /// </summary>
+    private SnowmanAccessory snowmanAccessory;
+
     // Start is called before the first frame update
     void Start() 
     {
         currentDisplayColor = PrimitiveColor;
+        snowmanAccessory = GetComponent<SnowmanAccessory>();
+        GetComponent<Renderer>().material.SetFloat("transparentObj", snowmanAccessory.ContainerObj ? 0f : 1f);
     }
 
     // Update is called once per frame
@@ -102,8 +109,6 @@ public class NodePrimitive : MonoBehaviour
         {
             currentTransform = ComputeTransform(ref nodeMatrix);
             GetComponent<Renderer>().material.SetMatrix("XformMat", currentTransform);
-            GetComponent<Renderer>().material.SetColor("desiredColor", currentDisplayColor);
-
             BreakdownTransform(currentTransform, out Vector3 pos, out Quaternion rot, out Vector3 scale);
         }
         else
@@ -161,28 +166,15 @@ public class NodePrimitive : MonoBehaviour
         Vector3 linearViewPosToObject = cameraTransform.position + (posProjectionOnView * cameraTransform.forward);
         Vector3 centerToLinearPoint = linearViewPosToObject - position;
 
-        //TODO: If time allows, we shold probably revisit this. The detection here is pretty forgiving since we're checking against the largest scale value
-        float comparableScaleSize = scale.x;
-
-        if (scale.y > comparableScaleSize)
-        {
-            comparableScaleSize = scale.y;
-        }
-
-        if (scale.z > comparableScaleSize)
-        {
-            comparableScaleSize = scale.x;
-        }
-
-        if (centerToLinearPoint.magnitude < (comparableScaleSize / 2) && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
+        if (centerToLinearPoint.magnitude < (scale.x / 2) && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
         {
             selectable = true;
-            currentDisplayColor = Color.green;
+            SetColor(Color.green);
         }
         else
         {
             selectable = false;
-            currentDisplayColor = PrimitiveColor;
+            SetColor(PrimitiveColor);
         }
         return selectable;
     }
@@ -260,12 +252,12 @@ public class NodePrimitive : MonoBehaviour
         if (centerToLinearPoint.magnitude < cylinderLineVec.magnitude / 2 && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
         {
             selectable = true;
-            currentDisplayColor = Color.green;
+            SetColor(Color.green);
         }
         else
         {
             selectable = false;
-            currentDisplayColor = PrimitiveColor;
+            SetColor(PrimitiveColor);
         }
 
         if (Application.isEditor)
@@ -400,5 +392,19 @@ public class NodePrimitive : MonoBehaviour
         }
         return false;
         
+    }
+
+    /// <summary>
+    /// Set the color of the game object and any related child objects
+    /// </summary>
+    /// <param name="color"></param>
+    private void SetColor(Color color)
+    {
+        if (snowmanAccessory != null)
+        {
+            GetComponent<Renderer>().material.SetColor("desiredColor", color);
+            snowmanAccessory.SetColor(color);
+            currentDisplayColor = color;
+        }
     }
 }
