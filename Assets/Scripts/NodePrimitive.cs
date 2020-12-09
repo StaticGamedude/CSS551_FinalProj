@@ -135,6 +135,13 @@ public class NodePrimitive : MonoBehaviour
                 default:
                     return DetermineSphereLookAt(ref position, ref rotation, ref scale, cameraTransform);
             }
+
+            /**The code below is commented since it may be revisited later on if time allowed. The code below
+            * attempts to help support scaling of the scene nodes by allowing manipulation of scale node primitives
+            */
+            //Matrix4x4 inverseParents = nodeMatrix.inverse;
+            //Matrix4x4 cameraMat = Matrix4x4.TRS(cameraTransform.position, cameraTransform.rotation, cameraTransform.localScale);
+            //cameraMat = inverseParents * cameraMat;
         }
         return false;
     }
@@ -179,6 +186,53 @@ public class NodePrimitive : MonoBehaviour
         }
         return selectable;
     }
+
+    /**The code below is commented since it may be revisited later on if time allowed. The code below
+     * attempts to help support scaling of the scene nodes by allowing manipulation of scale node primitives
+     */
+    //private bool DetermineSphereLookAt(Matrix4x4 cameraTransform)
+    //{
+    //    Matrix4x4 identity = Matrix4x4.identity;
+    //    Matrix4x4 trs = ComputeTransform(ref identity);
+    //    GameObject tempObject = new GameObject();
+        
+    //    BreakdownTransform(trs, out Vector3 objectPos, out Quaternion objRotation, out Vector3 objScale);
+    //    BreakdownTransform(cameraTransform, out Vector3 camPos, out Quaternion camRotation, out Vector3 camScale);
+    //    tempObject.transform.rotation = camRotation;
+
+    //    Vector3 camToPrimitive = objectPos - camPos;
+    //    float posProjectionOnView = Vector3.Dot(camToPrimitive, tempObject.transform.forward);
+    //    Vector3 linearViewPosToObject = camPos + (posProjectionOnView * tempObject.transform.forward);
+    //    Vector3 centerToLinearPoint = linearViewPosToObject - objectPos;
+
+    //    //objScale.x; //Each scale value should be the same;
+    //    if (centerToLinearPoint.magnitude < (objScale.x / 2) && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
+    //    {
+    //        selectable = true;
+    //        currentDisplayColor = Color.green;
+    //    }
+    //    else
+    //    {
+    //        selectable = false;
+    //        currentDisplayColor = PrimitiveColor;
+    //    }
+
+    //    if (Application.isEditor)
+    //    {
+    //        /** 
+    //         * Since we use [ExecuteInEditMode] to be able to see all of our objects while working on the scene, it seems that Unity is unable
+    //         * to delete objects using the normal Destory method while in the editor mode. Rather, DestoryImmediate is needed. Not doing this, yields to
+    //         * empty game objects in the scene every time the application is run.
+    //         */
+    //        DestroyImmediate(tempObject);
+    //    }
+    //    else
+    //    {
+    //        Destroy(tempObject);
+    //    }
+
+    //    return selectable;
+    //}
 
     /// <summary>
     /// Handles the look at detection for cylinder node primitives
@@ -231,6 +285,61 @@ public class NodePrimitive : MonoBehaviour
         return selectable;
     }
 
+    /**The code below is commented since it may be revisited later on if time allowed. The code below
+     * attempts to help support scaling of the scene nodes by allowing manipulation of scale node primitives
+     */
+    //private bool DetermineCylinderLookat(Matrix4x4 cameraTransform)
+    //{
+    //    Matrix4x4 identity = Matrix4x4.identity;
+    //    Matrix4x4 trs = ComputeTransform(ref identity);
+
+    //    BreakdownTransform(trs, out Vector3 objectPos, out Quaternion objRotation, out Vector3 objScale);
+    //    BreakdownTransform(cameraTransform, out Vector3 camPos, out Quaternion camRotation, out Vector3 camScale);
+
+
+    //    GameObject tempCopyObj = new GameObject();
+    //    GameObject tempCameraObj = new GameObject();
+    //    Vector3 camToPrimitive = objectPos - camPos;
+
+    //    tempCopyObj.transform.rotation = objRotation; //Set the rotation to an empty game object to try to determine the up vector of the cylinder
+    //    tempCameraObj.transform.rotation = camRotation;
+
+    //    Vector3 primitiveUp = tempCopyObj.transform.up;
+    //    Vector3 cylinderBottomPos = objectPos - (objScale.y * primitiveUp);
+    //    Vector3 cylinderTopPos = objectPos + (objScale.y * primitiveUp);
+    //    Vector3 cylinderLineVec = cylinderTopPos - cylinderBottomPos;
+    //    float posProjectionOnView = Vector3.Dot(camToPrimitive, tempCameraObj.transform.forward);
+    //    Vector3 linearViewPosToObject = camPos + (posProjectionOnView * tempCameraObj.transform.forward);
+    //    Vector3 centerToLinearPoint = linearViewPosToObject - objectPos;
+
+    //    if (centerToLinearPoint.magnitude < cylinderLineVec.magnitude / 2 && camToPrimitive.magnitude < ALLOWABLE_SELECTION_DISTANCE)
+    //    {
+    //        selectable = true;
+    //        currentDisplayColor = Color.green;
+    //    }
+    //    else
+    //    {
+    //        selectable = false;
+    //        currentDisplayColor = PrimitiveColor;
+    //    }
+
+    //    if (Application.isEditor)
+    //    {
+    //        /** 
+    //         * Since we use [ExecuteInEditMode] to be able to see all of our objects while working on the scene, it seems that Unity is unable
+    //         * to delete objects using the normal Destory method while in the editor mode. Rather, DestoryImmediate is needed. Not doing this, yields to
+    //         * empty game objects in the scene every time the application is run.
+    //         */
+    //        DestroyImmediate(tempCopyObj);
+    //    }
+    //    else
+    //    {
+    //        Destroy(tempCopyObj);
+    //    }
+
+    //    return selectable;
+    //}
+
     /// <summary>
     /// Get the position, rotation, and scale values of a given matrix transform
     /// </summary>
@@ -273,10 +382,11 @@ public class NodePrimitive : MonoBehaviour
             BreakdownTransform(currentTransform, out Vector3 originalPosition, out Quaternion originalRotation, out Vector3 originalScale);
 
             Vector3 changeInPosition = transform.position - originalPosition;
+            Vector3 changeInScale = transform.localScale - originalScale;
             //TOOD: Add support for change in rotation
             //TODO: Add support for change in scale
 
-            Matrix4x4 userDelta = Matrix4x4.TRS(changeInPosition, Quaternion.identity, Vector3.one);
+            Matrix4x4 userDelta = Matrix4x4.TRS(changeInPosition, Quaternion.identity, changeInScale);
             Matrix4x4 updatedPos = Matrix4x4.identity;
 
             updatedPos = nodeMatrix.inverse * userDelta;
