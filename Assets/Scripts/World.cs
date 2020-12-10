@@ -320,9 +320,11 @@ public class World : MonoBehaviour
             {
                 snowmanObject.layer = 0; //Change the layer since we no longer want to treat this object as an free object
                 snowmanObject.GetComponent<Renderer>().material = stardardObjectMat;
+                accessory.UpdateMaterial(stardardObjectMat);
                 NodePrimitive primitive = snowmanObject.AddComponent<NodePrimitive>();
                 primitive.PrimitiveColor = accessory.PrimaryColor;
                 primitive.detectionType = accessory.DetectionType;
+                accessory.SetColor(accessory.PrimaryColor);
                 SceneNode node = GetSnowmanSceneNode();
                 node.AddPrimitive(primitive);
             }

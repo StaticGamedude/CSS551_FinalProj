@@ -77,9 +77,11 @@ public class NodePrimitive : MonoBehaviour
     // Start is called before the first frame update
     void Start() 
     {
-        currentDisplayColor = PrimitiveColor;
         snowmanAccessory = GetComponent<SnowmanAccessory>();
+        currentDisplayColor = PrimitiveColor;
         GetComponent<Renderer>().material.SetFloat("transparentObj", snowmanAccessory.ContainerObj ? 0f : 1f);
+
+        Debug.Assert(snowmanAccessory != null); //Expected to be on the object already or added during NodePrimitive creation
     }
 
     // Update is called once per frame
@@ -108,14 +110,23 @@ public class NodePrimitive : MonoBehaviour
         if (parentCameraTransform == null)
         {
             currentTransform = ComputeTransform(ref nodeMatrix);
-            GetComponent<Renderer>().material.SetMatrix("XformMat", currentTransform);
-            BreakdownTransform(currentTransform, out Vector3 pos, out Quaternion rot, out Vector3 scale);
+            if (snowmanAccessory != null)
+            {
+                snowmanAccessory.UpdatePosition(ref currentTransform);
+            }
+            else
+            {
+                /** Note: This else case should only happen when viewing the scene in the Editor with the 
+                 * [ExecuteInEditMode]. the snowmanAccessory component is recognized on start which results in a 
+                 * NullReferenceException while working on the scene. 
+                 */
+                GetComponent<Renderer>().material.SetMatrix("XformMat", currentTransform);
+            }
         }
         else
         {
             Matrix4x4 holdingTRS = Matrix4x4.TRS(transform.position, transform.rotation, transform.localScale);
-            GetComponent<Renderer>().material.SetMatrix("XformMat", holdingTRS);
-            GetComponent<Renderer>().material.SetColor("desiredColor", currentDisplayColor);
+            snowmanAccessory.UpdatePosition(ref holdingTRS);
         }
     }
 
