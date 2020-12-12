@@ -76,7 +76,7 @@ public class UIController : MonoBehaviour
     /// <summary>
     /// Possible transform mode options
     /// </summary>
-    private TransformMode[] transformModeOptions = new TransformMode[] { TransformMode.TRANSLATE, TransformMode.SCALE, TransformMode.ROTATE };
+    private TransformMode[] transformModeOptions = new TransformMode[] { TransformMode.TRANSLATE, TransformMode.ROTATE };
 
     /// <summary>
     /// Possible transform axis options

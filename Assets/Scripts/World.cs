@@ -62,7 +62,7 @@ public class World : MonoBehaviour
         Debug.Assert(TorsoAccessories != null);
         Debug.Assert(HeadAccessories != null);
 
-        ShowAppropriateSnowmanObjects();
+        UpdateSceneObjects();
     }
 
     // Update is called once per frame
@@ -143,7 +143,7 @@ public class World : MonoBehaviour
         {
             currentNodeIndex++;
         }
-        ShowAppropriateSnowmanObjects();
+        UpdateSceneObjects();
     }
 
     /// <summary>
@@ -348,9 +348,10 @@ public class World : MonoBehaviour
     }
 
     /// <summary>
-    /// Determines which set of snowman accessories to set active in the world base on the current snowman node
+    /// Determines which set of snowman accessories to set active in the world base on the current snowman node. Also
+    /// sets the selection flag on the approprate scene node
     /// </summary>
-    private void ShowAppropriateSnowmanObjects()
+    private void UpdateSceneObjects()
     {
         SnowmanNodes currentNode = snowmanNodes[currentNodeIndex];
         BaseAccessories.SetActive(false);
@@ -369,5 +370,7 @@ public class World : MonoBehaviour
                 HeadAccessories.SetActive(true);
                 break;
         }
+
+        BaseNode.UpdateSelections(currentNode);
     }
 }
