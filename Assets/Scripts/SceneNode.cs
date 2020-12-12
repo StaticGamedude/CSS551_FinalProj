@@ -32,8 +32,27 @@ public class SceneNode : MonoBehaviour
     /// </summary>
     public List<NodePrimitive> PrimitiveList;
 
+    /// <summary>
+    /// Reference the axis frame prefab
+    /// </summary>
+    private GameObject axisFramePrefab;
+
+    /// <summary>
+    /// Reference to the axis frame game object that is used to help show the orientation of the scene node
+    /// </summary>
+    private GameObject axisFrame;
+
+    /// <summary>
+    /// Flag to indicate whether or not this scene node is the scene node currently selected in the world
+    /// </summary>
+    private bool selected;
+
     // Start is called before the first frame update
-    void Start() { }
+    void Start() 
+    {
+        axisFramePrefab = Resources.Load("AxisFrame", typeof(GameObject)) as GameObject;
+        Debug.Assert(axisFramePrefab != null);
+    }
 
     // Update is called once per frame
     void Update() { }
@@ -67,6 +86,8 @@ public class SceneNode : MonoBehaviour
                 primitive.LoadShaderMatrix(ref combinedParentTransform);
             }
         }
+
+        UpdateAxisFramePosition();
     }
 
     /// <summary>
@@ -184,6 +205,57 @@ public class SceneNode : MonoBehaviour
             Vector3 updatedLocalPosition = newPrimitive.transform.position - currentSceneNodePosition;
             newPrimitive.transform.localPosition = updatedLocalPosition;
             PrimitiveList.Add(newPrimitive);
+        }
+    }
+
+    /// <summary>
+    /// Updates the position and orientation of the axis frame. Also takes care of 
+    /// instantiated the axis frame if not done so already. Also takes care of removing it if the
+    /// scene node is no longer selected
+    /// </summary>
+    private void UpdateAxisFramePosition()
+    {
+        if (selected && axisFrame == null)
+        {
+            axisFrame = Instantiate(axisFramePrefab);
+        }
+        else if (!selected && axisFrame != null)
+        {
+            Destroy(axisFrame);
+            axisFrame = null;
+        }
+
+        if (axisFrame != null)
+        {
+            axisFrame.transform.localPosition = combinedParentTransform.GetColumn(3);
+            Vector3 up = combinedParentTransform.GetColumn(1).normalized;
+            Vector3 forward = combinedParentTransform.GetColumn(2).normalized;
+
+            float angle = Mathf.Acos(Vector3.Dot(Vector3.up, up)) * Mathf.Rad2Deg;
+            Vector3 axis = Vector3.Cross(Vector3.up, up);
+            axisFrame.transform.localRotation = Quaternion.AngleAxis(angle, axis);
+
+            angle = Mathf.Acos(Vector3.Dot(axisFrame.transform.forward, forward)) * Mathf.Rad2Deg;
+            axis = Vector3.Cross(axisFrame.transform.forward, forward);
+            axisFrame.transform.localRotation = Quaternion.AngleAxis(angle, axis) * axisFrame.transform.localRotation;
+        }
+    }
+
+    /// <summary>
+    /// Set the selected flag for the scene node
+    /// </summary>
+    /// <param name="selected"></param>
+    public void UpdateSelections(SnowmanNodes selectedNode)
+    {
+        selected = selectedNode == node;
+
+        foreach (Transform child in transform)
+        {
+            SceneNode childNode = child.GetComponent<SceneNode>();
+            if (childNode != null)
+            {
+                childNode.UpdateSelections(selectedNode);
+            }
         }
     }
 }
