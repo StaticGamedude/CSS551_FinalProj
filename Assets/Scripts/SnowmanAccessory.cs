@@ -11,6 +11,8 @@ public class SnowmanAccessory : MonoBehaviour
 
     public bool ContainerObj = false;
 
+    public bool hasTexture = false;
+
     void Start() { }
 
     // Update is called once per frame
@@ -29,6 +31,7 @@ public class SnowmanAccessory : MonoBehaviour
             if (colorSelf && renderer != null && renderer.material != null)
             {
                 renderer.material.SetColor("desiredColor", color);
+                renderer.material.SetFloat("hasTexture", hasTexture ? 1f : 0f);
             }
 
             foreach(Transform child in obj.transform)
