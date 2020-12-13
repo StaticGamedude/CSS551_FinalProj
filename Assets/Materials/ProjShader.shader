@@ -44,15 +44,16 @@
             {
                 //Position data passed explicity from CPU
                 v2f o;
-                o.vertex = mul(XformMat, v.vertex);
-                o.vertex = mul(UNITY_MATRIX_VP, o.vertex);
+                float4 vertexWorldPos = mul(XformMat, v.vertex); //Apply our transform to each vertex. Storing this value to be used elsewhere
+                o.vertex = vertexWorldPos; //Set the world position 
+                o.vertex = mul(UNITY_MATRIX_VP, o.vertex); //Convert the position to projection space
 
-                o.uv = v.uv;
-                o.vertexWC = mul(UNITY_MATRIX_M, v.vertex); //using o.vertex since the resulting position should be in world space
+                o.uv = v.uv; //For textures. Not doing anything in particular for this
+                o.vertexWC = vertexWorldPos; 
 
-                float3 p = v.vertex + v.normal;
-                p = mul(UNITY_MATRIX_M, p);  // now in WC space
-                o.normal = normalize(p - o.vertexWC); // NOTE: this is in the world space!!
+                float3 p = v.vertex + v.normal; //The vertex normal + vertex position in object space
+                p = mul(XformMat, p); //convert this point to world space
+                o.normal = normalize(p - o.vertexWC); 
 
                 return o;
             }
@@ -65,10 +66,15 @@
             fixed4 frag(v2f i) : SV_Target
             {
                 if (transparentObj == 0) {
+                    //To help support more complex snowman accessories. The container object holding multiple children
+                    //has an "invisible" mesh. If we are one of these objects, we can simply toss out the fragment.
+                    //NOTE TO SELF: I tried setting the alpha to 0 initially, but it was resulting in a black color for some reason
                     discard;
                 }
                 
                 if (hasTexture == 1) {
+                    //If we're using a texture as opposed to a solid color. Attempt to determine how "strong" the light source is
+                    //on the fragment
                     fixed4 col = tex2D(_MainTex, i.uv);
                     float diff = ComputeDiffuse(i);
                     return col * diff;
