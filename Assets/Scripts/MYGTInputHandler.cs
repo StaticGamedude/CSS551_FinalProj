@@ -6,12 +6,20 @@ public class MYGTInputHandler : InputHandler
 {
     public float GetXInputMovement()
     {
-        return Input.GetAxis("Horizontal");
+        return Input.GetAxis("Horizontal") * -1; //For some reason, the value coming back is inversed.
     }
 
     public float GetYInputMovement()
     {
-        return 0f; //TODO: Determine which button on the controller would be best suited for this
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            return -1f;
+        }
+        else if (Input.GetKey(KeyCode.RightShift))
+        {
+            return 1f;
+        }
+        return 0f;
     }
 
     public float GetZInputMovmeent()
@@ -26,12 +34,12 @@ public class MYGTInputHandler : InputHandler
 
     public bool isDecrementButtonPressed()
     {
-        return Input.GetKey(KeyCode.LeftShift);
+        return Input.GetKey(KeyCode.LeftAlt);
     }
 
     public bool isIncrementButtonPressed()
     {
-        return Input.GetKey(KeyCode.RightShift);
+        return Input.GetKey(KeyCode.RightAlt);
     }
 
     public bool isSelectionButtonHeld()
