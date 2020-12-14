@@ -399,6 +399,7 @@ public class NodePrimitive : MonoBehaviour
             transform.localPosition = originalPosition + newPos;
             
             parentCameraTransform = null;
+            Debug.Log("releaseobjectinnodeprimitive");
             return true;
         }
         return false;

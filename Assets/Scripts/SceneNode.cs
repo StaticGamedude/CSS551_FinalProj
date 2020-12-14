@@ -22,6 +22,8 @@ public class SceneNode : MonoBehaviour
     /// </summary>
     public Vector3 nodeOrigin = Vector3.zero;
 
+    public Transform smallCam; 
+
     /// <summary>
     /// Combination of the parent's tranform, our pivot position (if one specified), and our scene node's transform (TRS). 
     /// </summary>
@@ -87,6 +89,12 @@ public class SceneNode : MonoBehaviour
             }
         }
 
+        if (smallCam != null)
+        {
+            smallCam.localPosition = combinedParentTransform.MultiplyPoint(new Vector3(0f, 3.81f, -0.92f));
+            smallCam.up = transform.up;
+            smallCam.forward = -transform.forward;
+        }
         UpdateAxisFramePosition();
     }
 
