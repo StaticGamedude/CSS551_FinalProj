@@ -39,6 +39,11 @@ public class UIController : MonoBehaviour
     private const int SNOWMAN_OBJECT_LAYER = 8;
 
     /// <summary>
+    /// The object layer referring to light source game objects that can be moved around
+    /// </summary>
+    private const int LIGHT_OBJECT_LAYER = 9;
+
+    /// <summary>
     /// Reference to the UI text for displaying the current snowman node selected in the world
     /// </summary>
     public Text snowmanNodeValueText;
@@ -94,9 +99,9 @@ public class UIController : MonoBehaviour
     private int transformAxisIndex = 0;
 
     /// <summary>
-    /// Reference to the game object being held as the user is position it to be placed on the snowman scene node
+    /// Reference to the game object being held as the users moves it around in the scene (either snowman accessory or light source)
     /// </summary>
-    private GameObject heldSnowmanObject = null;
+    private GameObject worldObject = null;
 
     // Start is called before the first frame update
     void Start()
@@ -223,30 +228,36 @@ public class UIController : MonoBehaviour
         {
             if (inputHandler.isSelectionButtonPressed())
             {
-                if (heldSnowmanObject == null)
+                if (worldObject == null)
                 {
-                    /**
-                     * TODO: Since this behavior is not directly associated with our SceneNode structure to start,
-                     * we should check with Professor Sung to make sure we can perform a Raycast here
-                     */
                     RaycastHit hit;
                     int snowmanObjectLayer = 1 << SNOWMAN_OBJECT_LAYER;
+                    int lightObjectLayer = 1 << LIGHT_OBJECT_LAYER;
                     if (Physics.Raycast(mainCam.transform.position, mainCam.transform.forward, out hit, Mathf.Infinity, snowmanObjectLayer))
                     {
-                        heldSnowmanObject = hit.collider.gameObject;
-                        GameObject clonedObject = Instantiate(heldSnowmanObject); //Duplicate the game object so that users can add a new of of this object later
-                        clonedObject.transform.position = heldSnowmanObject.transform.position;
-                        clonedObject.transform.parent = heldSnowmanObject.transform.parent;
-                        heldSnowmanObject.transform.parent = mainCam.transform;
+                        worldObject = hit.collider.gameObject;
+                        GameObject clonedObject = Instantiate(worldObject); //Duplicate the game object so that users can add a new of of this object later
+                        clonedObject.transform.position = worldObject.transform.position;
+                        clonedObject.transform.parent = worldObject.transform.parent;
+                        worldObject.transform.parent = mainCam.transform;
                         world.SetSkipLookBehavior(true);
+                    }
+                    else if (Physics.Raycast(mainCam.transform.position, mainCam.transform.forward, out hit, Mathf.Infinity, lightObjectLayer))
+                    {
+                        worldObject = hit.collider.gameObject;
+                        worldObject.transform.parent = mainCam.transform;
                     }
                 }
                 else
                 {
-                    heldSnowmanObject.transform.parent = null;
-                    world.AddPrimitiveToCurrentNode(heldSnowmanObject);
-                    heldSnowmanObject = null;
-                    world.SetSkipLookBehavior(false);
+                    worldObject.transform.parent = null;
+                    if (worldObject.layer == 1 << SNOWMAN_OBJECT_LAYER)
+                    {
+                        world.AddPrimitiveToCurrentNode(worldObject);
+                        world.SetSkipLookBehavior(false);
+                    }
+                    worldObject = null;
+                    
                 }
             }
         }
