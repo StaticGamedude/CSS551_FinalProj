@@ -220,7 +220,8 @@ public class UIController : MonoBehaviour
     }
 
     /// <summary>
-    /// Handles the inputs for interacting with game objects that can become node primitives in our world
+    /// Handles the inputs for interacting with game objects that can become node primitives in our world. Also handles input for handling the light source
+    /// in the scene
     /// </summary>
     private void HandleNewObjectManipulation()
     {
@@ -251,7 +252,7 @@ public class UIController : MonoBehaviour
                 else
                 {
                     worldObject.transform.parent = null;
-                    if (worldObject.layer == 1 << SNOWMAN_OBJECT_LAYER)
+                    if (worldObject.layer == SNOWMAN_OBJECT_LAYER)
                     {
                         world.AddPrimitiveToCurrentNode(worldObject);
                         world.SetSkipLookBehavior(false);

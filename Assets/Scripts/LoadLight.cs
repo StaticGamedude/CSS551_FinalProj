@@ -1,4 +1,9 @@
-﻿using System.Collections;
+﻿/**
+ * Tori Salvatore, Drew Nelson - Final Project
+ * CSS 551 - Advance Computer Graphics
+ * Autumn 2020
+ */
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
