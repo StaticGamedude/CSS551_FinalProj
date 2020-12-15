@@ -126,6 +126,7 @@ public class UIController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Debug.Log("uicontroller"); 
         HandlePlayerMovementInput();
         HandleSceneNodeManipluation();
         HandleNodePrimitiveManipulation();
@@ -199,6 +200,7 @@ public class UIController : MonoBehaviour
         }
         else if (inputHandler.isSelectionButtonPressed())
         {
+            Debug.Log("uicontroller releaseobject called");
             world.ReleaseObject();
         }
 
