@@ -54,6 +54,7 @@ public class SceneNode : MonoBehaviour
     {
         axisFramePrefab = Resources.Load("AxisFrame", typeof(GameObject)) as GameObject;
         Debug.Assert(axisFramePrefab != null);
+        UpdateAxisFramePosition();
     }
 
     // Update is called once per frame
@@ -91,7 +92,7 @@ public class SceneNode : MonoBehaviour
 
         if (smallCam != null)
         {
-            smallCam.localPosition = combinedParentTransform.MultiplyPoint(new Vector3(0f, 3.81f, -0.92f));
+            smallCam.localPosition = combinedParentTransform.MultiplyPoint(new Vector3(0f, 0, -4f));
             smallCam.up = transform.up;
             smallCam.forward = -transform.forward;
         }

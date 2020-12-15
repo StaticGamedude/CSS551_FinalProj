@@ -7,17 +7,21 @@ public class SmallCamActivation : MonoBehaviour
 
     public GameObject smallCamQuad;
 
-    public GameObject sceneNode; 
+    public GameObject sceneNode;
+
+    public GameObject directionLine;
 
     // Start is called before the first frame update
     void Start()
     {
-        smallCamQuad.SetActive(false); 
+        smallCamQuad.SetActive(false);
+        directionLine.SetActive(false);
     }
 
     public void ShowCam()
     {
         smallCamQuad.SetActive(true);
+        directionLine.SetActive(true);
     }
 
     void OnDisable()
