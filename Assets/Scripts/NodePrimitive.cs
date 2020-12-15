@@ -400,14 +400,19 @@ public class NodePrimitive : MonoBehaviour
             transform.localPosition = originalPosition + newPos;
             
             parentCameraTransform = null;
-            if(gameObject.name.Equals("TopHat"))
-            {
-                GetComponent<SmallCamActivation>().ShowCam(); 
-            }
+            
             return true;
         }
         return false;
         
+    }
+
+    public void TryEnableSmallCam()
+    {
+        if (gameObject.name.Equals("TopHat"))
+        {
+            GetComponent<SmallCamActivation>().ShowCam();
+        }
     }
 
     /// <summary>

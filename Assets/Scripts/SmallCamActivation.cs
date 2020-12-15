@@ -22,7 +22,7 @@ public class SmallCamActivation : MonoBehaviour
 
     void OnDisable()
     {
-        smallCamQuad.SetActive(false); 
+        //smallCamQuad.SetActive(false); 
     }
 
 }

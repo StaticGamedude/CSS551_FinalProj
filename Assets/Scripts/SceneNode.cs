@@ -214,6 +214,7 @@ public class SceneNode : MonoBehaviour
             Vector3 updatedLocalPosition = newPrimitive.transform.position - currentSceneNodePosition;
             newPrimitive.transform.localPosition = updatedLocalPosition;
             PrimitiveList.Add(newPrimitive);
+            newPrimitive.TryEnableSmallCam();
         }
     }
 
