@@ -380,6 +380,7 @@ public class NodePrimitive : MonoBehaviour
 
     public bool ReleaseObject(Matrix4x4 nodeMatrix)
     {
+        Debug.Log("NodePrimitive.cs is calling ReleaseObject() for " + gameObject.name); 
         if (parentCameraTransform != null)
         {
             BreakdownTransform(currentTransform, out Vector3 originalPosition, out Quaternion originalRotation, out Vector3 originalScale);
@@ -399,7 +400,10 @@ public class NodePrimitive : MonoBehaviour
             transform.localPosition = originalPosition + newPos;
             
             parentCameraTransform = null;
-            Debug.Log("releaseobjectinnodeprimitive");
+            if(gameObject.name.Equals("TopHat"))
+            {
+                GetComponent<SmallCamActivation>().ShowCam(); 
+            }
             return true;
         }
         return false;

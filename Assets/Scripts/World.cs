@@ -111,8 +111,12 @@ public class World : MonoBehaviour
     /// </summary>
     public void ReleaseObject()
     {
+        Debug.Log("ReleaseObject() called in World.cs  ");
+
         if (objectHeld)
         {
+            Debug.Log("ReleaseObject() called in World.cs for " + objectHeld);
+
             objectHeld = !BaseNode.ReleaseHeldObject();
             if (objectHeld)
             {
@@ -186,7 +190,7 @@ public class World : MonoBehaviour
 
         if (sceneNode == null)
         {
-            Debug.LogError("Unable to current scene node: " + GetSnowmanNodeName(currentNodeType));
+            Debug.LogError("Unable to get current scene node: " + GetSnowmanNodeName(currentNodeType));
         }
         return sceneNode;
     }

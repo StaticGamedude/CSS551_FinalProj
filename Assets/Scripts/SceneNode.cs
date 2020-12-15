@@ -140,6 +140,7 @@ public class SceneNode : MonoBehaviour
     /// <returns></returns>
     public bool ReleaseHeldObject()
     {
+        Debug.Log("SceneNode.cs is calling ReleaseHeldObject() for " + gameObject.name);
         bool objectFound = false;
 
         if (PrimitiveList.Count > 0)
