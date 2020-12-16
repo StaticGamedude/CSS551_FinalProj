@@ -6,7 +6,7 @@ public class MYGTInputHandler : InputHandler
 {
     public float GetXInputMovement()
     {
-        return Input.GetAxis("Horizontal") * -1; //For some reason, the value coming back is inversed.
+        return Input.GetAxis("Horizontal");
     }
 
     public float GetYInputMovement()
