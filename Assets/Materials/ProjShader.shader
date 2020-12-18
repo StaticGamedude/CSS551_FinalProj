@@ -39,6 +39,7 @@
             float transparentObj;
             float hasTexture;
             float4 LightPosition;
+            fixed4 LightColor;
 
             v2f vert(appdata v)
             {
@@ -77,7 +78,7 @@
                     //on the fragment
                     fixed4 col = tex2D(_MainTex, i.uv);
                     float diff = ComputeDiffuse(i);
-                    return col * diff;
+                    return col * LightColor * diff;
                 }
 
                 return desiredColor;

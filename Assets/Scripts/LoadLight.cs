@@ -11,8 +11,11 @@ public class LoadLight : MonoBehaviour
 {
     public Transform LightPosition;
 
+    public Color LightColor;
+
     void OnPreRender()
     {
         Shader.SetGlobalVector("LightPosition", LightPosition.position); //using world position since the light can be picked up and moved around
+        Shader.SetGlobalColor("LightColor", LightColor); 
     }
 }
